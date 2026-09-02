@@ -1,0 +1,41 @@
+﻿lokal nama_bahasa = "Luai"
+lokal versi = "1.0.0"
+
+cetak("===========================================")
+cetak("Pengujian Bahasa Pemrograman " .. nama_bahasa .. " v" .. versi)
+cetak("===========================================")
+
+lokal nilai_ujian = 85
+
+jika nilai_ujian >= 90 maka
+    cetak("Predikat: Sangat Memuaskan (A)")
+atau_jika nilai_ujian >= 80 maka
+    cetak("Predikat: Memuaskan (B)")
+atau_jika nilai_ujian >= 70 maka
+    cetak("Predikat: Cukup (C)")
+selain_itu
+    cetak("Predikat: Perlu Peningkatan (D)")
+selesai
+
+fungsi faktorial(n)
+    jika n <= 1 maka
+        kembalikan 1
+    selesai
+    kembalikan n * faktorial(n - 1)
+selesai
+
+cetak("Faktorial dari 5 adalah:", faktorial(5))
+
+cetak("Perulangan 'untuk' (1 sampai 5):")
+untuk i = 1, 5 lakukan
+    cetak("  Iterasi ke-", i, "kuadrat:", i * i)
+selesai
+
+cetak("Perulangan 'selama' (hitungan mundur):")
+lokal hitungan = 3
+selama hitungan > 0 lakukan
+    cetak("  Hitungan mundur:", hitungan)
+    hitungan = hitungan - 1
+selesai
+
+cetak("Pengujian selesai dengan sukses!")

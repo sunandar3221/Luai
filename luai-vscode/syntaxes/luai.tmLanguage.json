@@ -1,0 +1,198 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Luai",
+  "scopeName": "source.luai",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#builtins"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#labels"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "begin": "--\\[(=*)\\[",
+          "end": "\\]\\1\\]",
+          "name": "comment.block.luai"
+        },
+        {
+          "begin": "--",
+          "end": "$",
+          "name": "comment.line.double-dash.luai"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "begin": "\\[(=*)\\[",
+          "end": "\\]\\1\\]",
+          "name": "string.quoted.other.multiline.luai"
+        },
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double.luai",
+          "patterns": [
+            {
+              "include": "#escapes"
+            }
+          ]
+        },
+        {
+          "begin": "'",
+          "end": "'",
+          "name": "string.quoted.single.luai",
+          "patterns": [
+            {
+              "include": "#escapes"
+            }
+          ]
+        }
+      ]
+    },
+    "escapes": {
+      "patterns": [
+        {
+          "match": "\\\\([abfnrtv\\\\'\"]|x[0-9a-fA-F]{2}|[0-9]{1,3}|u\\{[0-9a-fA-F]+\\}|z\\s*)",
+          "name": "constant.character.escape.luai"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "\\b(jika|maka|atau_jika|selain_itu|selesai|untuk|selama|ulang|sampai|berhenti|lakukan|lompat_ke|kembalikan)\\b",
+          "name": "keyword.control.luai"
+        },
+        {
+          "match": "\\b(fungsi)\\b",
+          "name": "storage.type.luai"
+        },
+        {
+          "match": "\\b(lokal)\\b",
+          "name": "storage.modifier.luai"
+        },
+        {
+          "match": "\\b(dan|atau|bukan|dalam)\\b",
+          "name": "keyword.operator.logical.luai"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "match": "\\b(benar|salah|kosong|nihil)\\b",
+          "name": "constant.language.luai"
+        }
+      ]
+    },
+    "builtins": {
+      "patterns": [
+        {
+          "match": "\\b(cetak|tipe|ke_angka|ke_teks|pasangan|i_pasangan|masukan|lepas|tegaskan|kesalahan|panggil_aman|pcall_aman|xpcall_aman|set_metatabel|ambil_metatabel|koleksi_sampah|butuh|perlu|pilih|muat|muat_file|eksekusi_file)\\b",
+          "name": "support.function.builtin.luai"
+        },
+        {
+          "match": "\\b(matematika|tabel|teks|sistem|io|korutin)\\b",
+          "name": "support.class.library.luai"
+        },
+        {
+          "match": "\\b(self)\\b",
+          "name": "variable.language.self.luai"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "match": "(?:\\bfungsi\\b)\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:[.:][a-zA-Z_][a-zA-Z0-9_]*)*)",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.luai"
+            }
+          }
+        },
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.call.luai"
+            }
+          }
+        }
+      ]
+    },
+    "labels": {
+      "patterns": [
+        {
+          "match": "::([a-zA-Z_][a-zA-Z0-9_]*)::",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.label.luai"
+            },
+            "1": {
+              "name": "entity.name.label.luai"
+            }
+          }
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b0[xX][0-9a-fA-F]+(?:\\.[0-9a-fA-F]+)?(?:[pP][+-]?[0-9]+)?\\b",
+          "name": "constant.numeric.hex.luai"
+        },
+        {
+          "match": "\\b[0-9]+(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b|\\B\\.[0-9]+(?:[eE][+-]?[0-9]+)?\\b",
+          "name": "constant.numeric.decimal.luai"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "(\\+|\\-|\\*|\\/\\/|\\/|\\%|\\^)",
+          "name": "keyword.operator.arithmetic.luai"
+        },
+        {
+          "match": "(==|~=|<=|>=|<|>)",
+          "name": "keyword.operator.relational.luai"
+        },
+        {
+          "match": "(&|\\||~|>>|<<)",
+          "name": "keyword.operator.bitwise.luai"
+        },
+        {
+          "match": "(\\.\\.\\.|\\.\\.|#)",
+          "name": "keyword.operator.misc.luai"
+        }
+      ]
+    }
+  }
+}

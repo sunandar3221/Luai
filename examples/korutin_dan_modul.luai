@@ -1,0 +1,37 @@
+﻿lokal kalk = butuh("modul_kalkulator")
+
+cetak("Penggunaan Modul Kalkulator Eksternal:")
+cetak("  15 + 27 =", kalk.tambah(15, 27))
+cetak("  100 - 35 =", kalk.kurang(100, 35))
+cetak("  12 * 8 =", kalk.kali(12, 8))
+cetak("  144 / 12 =", kalk.bagi(144, 12))
+
+lokal status, hasil_atau_pesan = panggil_aman(fungsi()
+    kembalikan kalk.bagi(50, 0)
+selesai)
+
+jika bukan status maka
+    cetak("Penanganan Kesalahan Berhasil Tertangkap:")
+    cetak("  Pesan kesalahan:", hasil_atau_pesan)
+selesai
+
+fungsi produsen()
+    kembalikan korutin.buat(fungsi()
+        untuk i = 1, 3 lakukan
+            cetak("  [Produsen] Menghasilkan data paket ke-", i)
+            korutin.hasil("PaketData_" .. ke_teks(i))
+        selesai
+    selesai)
+selesai
+
+cetak("Pola Produsen-Konsumen Menggunakan Korutin:")
+lokal p = produsen()
+
+selama korutin.status(p) ~= "dead" lakukan
+    lokal st, item = korutin.lanjut(p)
+    jika st dan item ~= nihil maka
+        cetak("  [Konsumen] Menerima:", item)
+    selesai
+selesai
+
+cetak("Seluruh alur korutin dan modul selesai dengan sukses.")

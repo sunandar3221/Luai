@@ -1,0 +1,134 @@
+{
+  "name": "luai-vscode",
+  "displayName": "Luai - Bahasa Pemrograman Dialek Bahasa Indonesia",
+  "description": "Dukungan resmi sintaks, eksekusi berkas bawaan VS Code, REPL interaktif, dan snippets untuk bahasa pemrograman Luai.",
+  "version": "1.1.0",
+  "publisher": "luai-lang",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:luai"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "keywords": [
+    "luai",
+    "lua",
+    "indonesia",
+    "runner",
+    "programming language"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luai-lang/luai-vscode"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "luai.runFile",
+        "title": "Luai: Jalankan Berkas (Run File)",
+        "icon": "$(play)"
+      },
+      {
+        "command": "luai.runSelection",
+        "title": "Luai: Jalankan Kode Terpilih (Run Selection)",
+        "icon": "$(play-circle)"
+      },
+      {
+        "command": "luai.startRepl",
+        "title": "Luai: Buka Terminal Interaktif REPL",
+        "icon": "$(terminal)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "luai.runFile",
+          "when": "resourceExtname == .luai",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "luai.runFile",
+          "when": "resourceExtname == .luai",
+          "group": "1_luai@1"
+        },
+        {
+          "command": "luai.runSelection",
+          "when": "editorHasSelection && editorLangId == luai",
+          "group": "1_luai@2"
+        },
+        {
+          "command": "luai.startRepl",
+          "when": "editorLangId == luai",
+          "group": "1_luai@3"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "luai.runFile",
+          "when": "resourceExtname == .luai",
+          "group": "1_luai"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "luai.runFile",
+        "key": "ctrl+f5",
+        "when": "editorTextFocus && editorLangId == luai"
+      },
+      {
+        "command": "luai.runSelection",
+        "key": "shift+f5",
+        "when": "editorTextFocus && editorLangId == luai && editorHasSelection"
+      }
+    ],
+    "configuration": {
+      "title": "Luai",
+      "properties": {
+        "luai.executablePath": {
+          "type": "string",
+          "default": "",
+          "description": "Jalur kustom ke executable binary Luai (opsional, secara otomatis menggunakan binary bawaan di dalam ekstensi jika kosong)"
+        },
+        "luai.clearTerminalBeforeRun": {
+          "type": "boolean",
+          "default": true,
+          "description": "Bersihkan terminal sebelum menjalankan berkas kode Luai"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "luai",
+        "aliases": [
+          "Luai",
+          "luai"
+        ],
+        "extensions": [
+          ".luai"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "luai",
+        "scopeName": "source.luai",
+        "path": "./syntaxes/luai.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "luai",
+        "path": "./snippets/luai.code-snippets"
+      }
+    ]
+  }
+}

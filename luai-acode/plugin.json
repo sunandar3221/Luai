@@ -1,0 +1,23 @@
+{
+  "id": "com.luailang.acode",
+  "name": "Luai - Bahasa Pemrograman Luai",
+  "main": "main.js",
+  "version": "1.0.0",
+  "readme": "readme.md",
+  "icon": "icon.png",
+  "changelog": "changelog.md",
+  "author": {
+    "name": "Luai Language Project",
+    "email": "support@luai.dev",
+    "url": "https://github.com/luai-lang/luai-acode"
+  },
+  "description": "Ekstensi resmi Acode Android untuk bahasa pemrograman Luai: Syntax Highlighting, Runner mandiri terintegrasi (Zero-Config), dan Snippets.",
+  "keywords": [
+    "luai",
+    "lua",
+    "indonesia",
+    "runner",
+    "programming"
+  ],
+  "minVersionCode": 290
+}

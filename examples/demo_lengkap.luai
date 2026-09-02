@@ -1,0 +1,62 @@
+﻿lokal nama_aplikasi = "Sistem Manajemen Data Luai"
+lokal versi = 1.0
+
+cetak("================================================")
+cetak(nama_aplikasi .. " (Versi " .. ke_teks(versi) .. ")")
+cetak("================================================")
+
+lokal pengguna = {
+    nama = "Budi Santoso",
+    usia = 28,
+    status_aktif = benar,
+    nilai = {88, 92, 79, 95}
+}
+
+cetak("Nama Pengguna:", pengguna.nama)
+cetak("Usia:", pengguna.usia)
+cetak("Status Aktif:", pengguna.status_aktif)
+cetak("Tipe Data:", tipe(pengguna))
+
+jika pengguna.usia >= 18 dan pengguna.status_aktif maka
+    cetak("Akses diizinkan: Pengguna dewasa dan aktif.")
+atau_jika pengguna.usia < 18 maka
+    cetak("Akses ditolak: Di bawah umur.")
+selain_itu
+    cetak("Akses ditolak: Akun tidak aktif.")
+selesai
+
+lokal total_nilai = 0
+untuk indeks, nilai dalam pasangan(pengguna.nilai) lakukan
+    total_nilai = total_nilai + nilai
+selesai
+
+lokal rata_rata = total_nilai / #pengguna.nilai
+cetak("Rata-rata Nilai:", rata_rata)
+cetak("Akar Kuadrat Total Nilai:", matematika.akar(total_nilai))
+cetak("Nilai Dibulatkan ke Bawah:", matematika.lantai(rata_rata))
+cetak("Nilai Dibulatkan ke Atas:", matematika.atap(rata_rata))
+
+lokal teks_gabungan = teks.format("Hasil akhir untuk %s adalah %.2f", pengguna.nama, rata_rata)
+cetak(teks.huruf_besar(teks_gabungan))
+
+lokal data_acak = {}
+untuk i = 1, 5 lakukan
+    tabel.sisip(data_acak, (i * 17) % 50 + 10)
+selesai
+
+cetak("Data sebelum diurutkan:")
+untuk i, v dalam i_pasangan(data_acak) lakukan
+    cetak("  Elemen", i, ":", v)
+selesai
+
+tabel.urut(data_acak)
+
+cetak("Data setelah diurutkan:")
+cetak(" ", tabel.gabung(data_acak, ", "))
+
+lokal penampung = kosong
+jika penampung == nihil maka
+    cetak("Variabel 'penampung' terbukti bernilai kosong/nihil.")
+selesai
+
+cetak("Demonstrasi lengkap berhasil dijalankan.")

@@ -1,0 +1,7 @@
+lokal usia = 1
+
+jika usia >= 18 maka
+    cetak("kamu sudah dewasa")
+atau_jika usia < 18 maka
+    cetak("Bocil pulang")
+selesai

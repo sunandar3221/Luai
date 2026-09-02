@@ -1,0 +1,139 @@
+{
+  "Deklarasi Fungsi": {
+    "prefix": "fungsi",
+    "body": [
+      "fungsi ${1:nama_fungsi}(${2:argumen})",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Membuat definisi fungsi baru"
+  },
+  "Deklarasi Fungsi Lokal": {
+    "prefix": "lokal_fungsi",
+    "body": [
+      "lokal fungsi ${1:nama_fungsi}(${2:argumen})",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Membuat definisi fungsi lokal"
+  },
+  "Percabangan Jika": {
+    "prefix": "jika",
+    "body": [
+      "jika ${1:kondisi} maka",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Struktur percabangan jika-maka-selesai"
+  },
+  "Percabangan Jika-Selain Itu": {
+    "prefix": "jika_selain_itu",
+    "body": [
+      "jika ${1:kondisi} maka",
+      "\t$2",
+      "selain_itu",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Struktur percabangan jika-selain_itu-selesai"
+  },
+  "Percabangan Jika-Atau Jika-Selain Itu": {
+    "prefix": "jika_lengkap",
+    "body": [
+      "jika ${1:kondisi_1} maka",
+      "\t$2",
+      "atau_jika ${3:kondisi_2} maka",
+      "\t$4",
+      "selain_itu",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Struktur percabangan lengkap jika-atau_jika-selain_itu-selesai"
+  },
+  "Perulangan Untuk Numerik": {
+    "prefix": "untuk",
+    "body": [
+      "untuk ${1:i} = ${2:1}, ${3:10} lakukan",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Perulangan numerik untuk-lakukan-selesai"
+  },
+  "Perulangan Pasangan Tabel": {
+    "prefix": "untuk_pasangan",
+    "body": [
+      "untuk ${1:k}, ${2:v} dalam pasangan(${3:tabel}) lakukan",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Perulangan pasangan kunci-nilai tabel"
+  },
+  "Perulangan Berurutan Array": {
+    "prefix": "untuk_i_pasangan",
+    "body": [
+      "untuk ${1:i}, ${2:v} dalam i_pasangan(${3:daftar}) lakukan",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Perulangan berurutan elemen array dengan i_pasangan"
+  },
+  "Perulangan Selama": {
+    "prefix": "selama",
+    "body": [
+      "selama ${1:kondisi} lakukan",
+      "\t$0",
+      "selesai"
+    ],
+    "description": "Perulangan selama kondisi bernilai benar"
+  },
+  "Perulangan Ulang-Sampai": {
+    "prefix": "ulang",
+    "body": [
+      "ulang",
+      "\t$0",
+      "sampai ${1:kondisi}"
+    ],
+    "description": "Perulangan ulang hingga kondisi terpenuhi"
+  },
+  "Template Kelas OOP": {
+    "prefix": "kelas",
+    "body": [
+      "lokal ${1:NamaKelas} = {}",
+      "${1:NamaKelas}.__index = ${1:NamaKelas}",
+      "",
+      "fungsi ${1:NamaKelas}.baru(${2:argumen})",
+      "\tlokal objek = set_metatabel({}, ${1:NamaKelas})",
+      "\t$0",
+      "\tkembalikan objek",
+      "selesai"
+    ],
+    "description": "Membuat template kelas OOP berbasis metatabel"
+  },
+  "Template Modul Luai": {
+    "prefix": "modul",
+    "body": [
+      "lokal ${1:NamaModul} = {}",
+      "",
+      "fungsi ${1:NamaModul}.${2:fungsi_utama}(${3:arg})",
+      "\t$0",
+      "selesai",
+      "",
+      "kembalikan ${1:NamaModul}"
+    ],
+    "description": "Membuat template modul baru yang dapat diimpor via butuh()"
+  },
+  "Cetak Terminal": {
+    "prefix": "cetak",
+    "body": [
+      "cetak(${1:nilai})"
+    ],
+    "description": "Menampilkan output teks ke terminal"
+  },
+  "Masukan Pengguna": {
+    "prefix": "masukan",
+    "body": [
+      "lokal ${1:teks} = masukan(\"${2:Masukkan data: }\")"
+    ],
+    "description": "Membaca baris input dari terminal pengguna"
+  }
+}

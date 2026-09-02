@@ -1,0 +1,62 @@
+﻿fungsi pembuat_penghitung(awal, langkah)
+    lokal nilai = awal
+    kembalikan fungsi()
+        nilai = nilai + langkah
+        kembalikan nilai
+    selesai
+selesai
+
+lokal hitung_tiga = pembuat_penghitung(0, 3)
+cetak("Penghitung dengan closure:")
+cetak("  Panggilan 1:", hitung_tiga())
+cetak("  Panggilan 2:", hitung_tiga())
+cetak("  Panggilan 3:", hitung_tiga())
+
+fungsi fibonacci(n)
+    jika n <= 0 maka
+        kembalikan 0
+    atau_jika n == 1 maka
+        kembalikan 1
+    selain_itu
+        kembalikan fibonacci(n - 1) + fibonacci(n - 2)
+    selesai
+selesai
+
+cetak("Deret Fibonacci (10 suku pertama):")
+untuk i = 0, 9 lakukan
+    cetak("  Suku ke-" .. ke_teks(i) .. ":", fibonacci(i))
+selesai
+
+fungsi petakan(daftar, operasi)
+    lokal hasil = {}
+    untuk _, item dalam i_pasangan(daftar) lakukan
+        tabel.sisip(hasil, operasi(item))
+    selesai
+    kembalikan hasil
+selesai
+
+lokal angka_dasar = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+lokal hasil_kubik = petakan(angka_dasar, fungsi(x) kembalikan x * x * x selesai)
+
+cetak("Hasil fungsi tingkat tinggi (Pangkat Tiga):")
+cetak(" ", tabel.gabung(hasil_kubik, ", "))
+
+cetak("Perulangan 'ulang' - 'sampai' dengan 'berhenti':")
+lokal k = 1
+ulang
+    jika k == 4 maka
+        cetak("  Mencapai angka 4, perulangan dihentikan paksa.")
+        berhenti
+    selesai
+    cetak("  Nilai k:", k)
+    k = k + 1
+sampai k > 10
+
+fungsi pembagian_dengan_sisa(pembilang, penyebut)
+    lokal hasil = pembilang // penyebut
+    lokal sisa = pembilang % penyebut
+    kembalikan hasil, sisa
+selesai
+
+lokal h, s = pembagian_dengan_sisa(47, 5)
+cetak("47 dibagi 5 = " .. ke_teks(h) .. " sisa " .. ke_teks(s))

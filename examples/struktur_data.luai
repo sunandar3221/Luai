@@ -1,0 +1,71 @@
+﻿lokal RekeningBank = {}
+RekeningBank.__index = RekeningBank
+
+fungsi RekeningBank.buat(nomor, pemilik, saldo_awal)
+    lokal objek = set_metatabel({}, RekeningBank)
+    objek.nomor = nomor
+    objek.pemilik = pemilik
+    objek.saldo = saldo_awal atau 0
+    kembalikan objek
+selesai
+
+fungsi RekeningBank:setor(jumlah)
+    jika jumlah > 0 maka
+        self.saldo = self.saldo + jumlah
+        kembalikan benar
+    selesai
+    kembalikan salah
+selesai
+
+fungsi RekeningBank:tarik(jumlah)
+    jika jumlah > 0 dan self.saldo >= jumlah maka
+        self.saldo = self.saldo - jumlah
+        kembalikan benar
+    selesai
+    kembalikan salah
+selesai
+
+fungsi RekeningBank:info()
+    kembalikan teks.format("Rekening [%s] Pemilik: %s | Saldo: Rp %d", self.nomor, self.pemilik, self.saldo)
+selesai
+
+lokal rek1 = RekeningBank.buat("001-A", "Ahmad Dahlan", 500000)
+lokal rek2 = RekeningBank.buat("002-B", "Siti Rahma", 1200000)
+
+cetak(rek1:info())
+cetak(rek2:info())
+
+cetak("Menyetor Rp 250.000 ke rekening Ahmad:")
+rek1:setor(250000)
+cetak(" ", rek1:info())
+
+cetak("Menarik Rp 300.000 dari rekening Siti:")
+rek2:tarik(300000)
+cetak(" ", rek2:info())
+
+lokal Vektor2D = {}
+Vektor2D.__index = Vektor2D
+
+fungsi Vektor2D.baru(x, y)
+    lokal instansi = set_metatabel({}, Vektor2D)
+    instansi.x = x
+    instansi.y = y
+    kembalikan instansi
+selesai
+
+Vektor2D.__add = fungsi(a, b)
+    kembalikan Vektor2D.baru(a.x + b.x, a.y + b.y)
+selesai
+
+Vektor2D.__tostring = fungsi(v)
+    kembalikan teks.format("Vektor(%d, %d)", v.x, v.y)
+selesai
+
+lokal v1 = Vektor2D.baru(10, 20)
+lokal v2 = Vektor2D.baru(5, 15)
+lokal v3 = v1 + v2
+
+cetak("Operasi Metatabel Vektor:")
+cetak("  v1 =", ke_teks(v1))
+cetak("  v2 =", ke_teks(v2))
+cetak("  v1 + v2 =", ke_teks(v3))

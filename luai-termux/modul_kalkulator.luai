@@ -1,0 +1,22 @@
+﻿lokal Kalkulator = {}
+
+fungsi Kalkulator.tambah(a, b)
+    kembalikan a + b
+selesai
+
+fungsi Kalkulator.kurang(a, b)
+    kembalikan a - b
+selesai
+
+fungsi Kalkulator.kali(a, b)
+    kembalikan a * b
+selesai
+
+fungsi Kalkulator.bagi(a, b)
+    jika b == 0 maka
+        kesalahan("Pembagian dengan nol tidak diperbolehkan!")
+    selesai
+    kembalikan a / b
+selesai
+
+kembalikan Kalkulator
