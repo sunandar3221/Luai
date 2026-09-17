@@ -1,7 +1,9 @@
 #include "repl.hpp"
 #include "lexer.hpp"
 
-#if __has_include("../luajit/src/lua.hpp")
+#if defined(USE_LUA54)
+#include "lua.hpp"
+#elif __has_include("../luajit/src/lua.hpp")
 #include "../luajit/src/lua.hpp"
 #elif __has_include("luajit.h")
 extern "C" {
