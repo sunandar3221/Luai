@@ -69,14 +69,14 @@ Skrip ini akan:
 
 ### 3. Instalasi di Android (Termux) — Tanpa Perlu Build
 
-Anda **TIDAK PERLU** mengompilasi atau build apa pun di Termux karena binary native siap pakai (ARM64 dan x86_64) sudah disediakan secara lengkap.
+Anda **TIDAK PERLU** mengompilasi atau build apa pun di Termux karena binary native siap pakai (**ARM 64-bit**, **ARM 32-bit**, dan **x86_64**) sudah disediakan secara lengkap. Kompilasi otomatis Termux juga di-build langsung melalui GitHub Actions CI/CD.
 
 #### Metode A: Instalasi Kilat 1 Baris Perintah (Direkomendasikan)
 Buka aplikasi **Termux** di perangkat Android Anda, pastikan memiliki koneksi internet, lalu jalankan perintah berikut:
 ```bash
 curl -sL https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/install.sh | bash
 ```
-> **Catatan:** Skrip ini otomatis mendeteksi arsitektur CPU perangkat Anda (`aarch64` / `arm64` atau `x86_64`), mengambil binary yang sesuai dari repositori GitHub, memasangnya langsung ke `$PREFIX/bin/luai`, dan memberikannya izin eksekusi.
+> **Catatan:** Skrip pintar ini otomatis mendeteksi arsitektur CPU perangkat Anda secara akurat (apakah **ARM 64-bit** `aarch64`, **ARM 32-bit** `armv7l` / `armhf`, atau **x86_64`), mengunduh binary yang sesuai dari repositori/rilis GitHub, memasangnya langsung ke `$PREFIX/bin/luai`, dan memverifikasi kesehatannya.
 
 #### Metode B: Mengunduh Arsip dari GitHub Release
 1. Unduh berkas `luai-termux.tar.gz` langsung dari halaman [GitHub Releases](https://github.com/sunandar3221/Luai/releases):

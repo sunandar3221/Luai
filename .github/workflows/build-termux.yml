@@ -1,0 +1,197 @@
+name: Build Android Termux Binaries
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'luajit/**'
+      - 'luai-termux/**'
+      - '.github/workflows/build-termux.yml'
+  release:
+    types:
+      - published
+      - created
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-arm64:
+    name: Build ARM 64-bit (aarch64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install ARM64 Cross-Compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Build LuaJIT for ARM64
+        run: |
+          make -C luajit/src clean
+          make -C luajit/src -j$(nproc) CROSS=aarch64-linux-gnu- TARGET_SYS=Linux BUILDMODE=static XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
+
+      - name: Compile Luai ARM64 Binary
+        run: |
+          aarch64-linux-gnu-g++ -static -O2 -std=c++17 -Iluajit/src \
+            src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+            luajit/src/libluajit.a -o luai-arm64
+          aarch64-linux-gnu-strip luai-arm64
+          ls -lh luai-arm64
+
+      - name: Upload ARM64 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luai-arm64
+          path: luai-arm64
+
+  build-arm32:
+    name: Build ARM 32-bit (armv7l / armhf)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install ARM32 Cross-Compiler & Host 32-bit Support
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-i386
+
+      - name: Build LuaJIT for ARM32
+        run: |
+          make -C luajit/src clean
+          make -C luajit/src -j$(nproc) HOST_CC="gcc -m32" CROSS=arm-linux-gnueabihf- TARGET_SYS=Linux BUILDMODE=static XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
+
+      - name: Compile Luai ARM32 Binary
+        run: |
+          arm-linux-gnueabihf-g++ -static -O2 -std=c++17 -Iluajit/src \
+            src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+            luajit/src/libluajit.a -o luai-arm32
+          arm-linux-gnueabihf-strip luai-arm32
+          ls -lh luai-arm32
+
+      - name: Upload ARM32 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luai-arm32
+          path: luai-arm32
+
+  build-x86_64:
+    name: Build x86_64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install Build Essentials
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Build LuaJIT for x86_64
+        run: |
+          make -C luajit/src clean
+          make -C luajit/src -j$(nproc) TARGET_SYS=Linux BUILDMODE=static XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
+
+      - name: Compile Luai x86_64 Binary
+        run: |
+          g++ -static -O2 -std=c++17 -Iluajit/src \
+            src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+            luajit/src/libluajit.a -o luai-x86_64
+          strip luai-x86_64
+          ls -lh luai-x86_64
+
+      - name: Upload x86_64 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luai-x86_64
+          path: luai-x86_64
+
+  package-and-release:
+    name: Package Archives & Publish to GitHub Releases
+    needs: [build-arm64, build-arm32, build-x86_64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install Zip Tool
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
+
+      - name: Download ARM64 Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: luai-arm64
+          path: ./bin-arm64
+
+      - name: Download ARM32 Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: luai-arm32
+          path: ./bin-arm32
+
+      - name: Download x86_64 Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: luai-x86_64
+          path: ./bin-x86_64
+
+      - name: Assemble Termux Package Directory
+        run: |
+          cp -f bin-arm64/luai-arm64 luai-termux/luai-arm64
+          cp -f bin-arm32/luai-arm32 luai-termux/luai-arm32
+          cp -f bin-x86_64/luai-x86_64 luai-termux/luai-x86_64
+          cp -f luai-termux/luai-arm64 luai-termux/luai
+          chmod +x luai-termux/luai* luai-termux/install.sh
+
+          tar -czvf luai-termux.tar.gz luai-termux/
+          zip -r luai-termux.zip luai-termux/
+          ls -lh luai-termux/ luai-termux.tar.gz luai-termux.zip
+
+      - name: Upload Complete Termux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: luai-termux-all-packages
+          path: |
+            luai-termux/luai-arm64
+            luai-termux/luai-arm32
+            luai-termux/luai-x86_64
+            luai-termux/luai
+            luai-termux.tar.gz
+            luai-termux.zip
+
+      - name: Publish Binaries to GitHub Releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          if [ -z "$TAG_NAME" ]; then
+            TAG_NAME="v1.0.0"
+          fi
+
+          echo "Mengunggah paket binary ke GitHub Release: $TAG_NAME"
+          gh release upload "$TAG_NAME" \
+            luai-termux/luai-arm64 \
+            luai-termux/luai-arm32 \
+            luai-termux/luai-x86_64 \
+            luai-termux/luai \
+            luai-termux.tar.gz \
+            luai-termux.zip \
+            --clobber || true
+
+          gh release upload "BINARY" \
+            luai-termux/luai-arm64 \
+            luai-termux/luai-arm32 \
+            luai-termux/luai-x86_64 \
+            luai-termux/luai \
+            luai-termux.tar.gz \
+            luai-termux.zip \
+            --clobber 2>/dev/null || true

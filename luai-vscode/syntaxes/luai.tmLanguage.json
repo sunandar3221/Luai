@@ -114,11 +114,11 @@
     "builtins": {
       "patterns": [
         {
-          "match": "\\b(cetak|tipe|ke_angka|ke_teks|pasangan|i_pasangan|masukan|lepas|tegaskan|kesalahan|panggil_aman|pcall_aman|xpcall_aman|set_metatabel|ambil_metatabel|koleksi_sampah|butuh|perlu|pilih|muat|muat_file|eksekusi_file)\\b",
+          "match": "\\b(cetak|tipe|ke_angka|ke_teks|pasangan|i_pasangan|masukan|minta|tanya|baca|lepas|tegaskan|kesalahan|panggil_aman|pcall_aman|xpcall_aman|set_metatabel|ambil_metatabel|koleksi_sampah|butuh|perlu|pilih|muat|muat_file|eksekusi_file)\\b",
           "name": "support.function.builtin.luai"
         },
         {
-          "match": "\\b(matematika|tabel|teks|sistem|io|korutin)\\b",
+          "match": "\\b(matematika|tabel|teks|sistem|io|korutin|dasar|daar)\\b",
           "name": "support.class.library.luai"
         },
         {

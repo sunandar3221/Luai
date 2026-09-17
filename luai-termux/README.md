@@ -22,10 +22,11 @@ Paket binary ELF native mandiri (*statically linked*) bahasa pemrograman **Luai*
 
 | Berkas | Arsitektur | Keterangan |
 |:---|:---|:---|
-| `luai` | ARM64 (`aarch64`) | Binary utama untuk seluruh HP Android 64-bit modern |
-| `luai-arm64` | ARM64 (`aarch64`) | Binary versi ARM64 spesifik |
+| `luai` | Otomatis / ARM64 | Binary bawaan (default ARM64) |
+| `luai-arm64` | ARM64 (`aarch64`) | Binary khusus HP Android 64-bit modern |
+| `luai-arm32` | ARM 32-bit (`armv7l` / `armhf`) | Binary khusus HP Android 32-bit / tablet / Android GO |
 | `luai-x86_64` | x86_64 | Binary untuk Emulator Android / PC x86_64 |
-| `install.sh` | Bash Script | Skrip instalasi otomatis ke `$PREFIX/bin/luai` |
+| `install.sh` | Bash Script | Skrip instalasi pintar (auto deteksi ARM64 vs ARM32 vs x86) |
 | `test_luai.luai` | Luai Script | Skrip pengujian alur logika & sintaks |
 | `modul_kalkulator.luai` | Luai Module | Contoh pustaka modul Luai |
 
@@ -33,12 +34,15 @@ Paket binary ELF native mandiri (*statically linked*) bahasa pemrograman **Luai*
 
 ## Panduan Pemasangan di Termux (Tanpa Build)
 
-### Metode 1: Instalasi Kilat 1 Baris Perintah (Paling Mudah)
-Buka aplikasi **Termux** di Android, lalu jalankan satu baris perintah ini:
+### Metode 1: Instalasi Kilat 1 Baris Perintah (Otomatis & Pintar)
+Buka aplikasi **Termux** di Android, lalu cukup salin dan jalankan satu baris perintah ini:
 ```bash
 curl -sL https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/install.sh | bash
 ```
-> Perintah di atas akan mendeteksi arsitektur CPU Android Anda secara otomatis, mengunduh binary Luai, dan langsung memasangnya ke `$PREFIX/bin/luai`.
+> **Keunggulan Skrip Pintar:**
+> - Secara otomatis mendeteksi apakah perangkat Anda adalah **ARM 64-bit** (`aarch64`), **ARM 32-bit** (`armv7l` / `armhf`), atau **x86_64**.
+> - Mengunduh binary yang sesuai tanpa perlu kompilasi (*zero build*).
+> - Otomatis memberikan hak eksekusi dan memverifikasi kesehatan binary di `$PREFIX/bin/luai`.
 
 ### Metode 2: Menggunakan Arsip atau Berkas Lokal
 1. Jika Anda sudah memiliki folder `luai-termux` di Termux:
