@@ -31,10 +31,17 @@ Paket binary ELF native mandiri (*statically linked*) bahasa pemrograman **Luai*
 
 ---
 
-## Panduan Pemasangan di Termux
+## Panduan Pemasangan di Termux (Tanpa Build)
 
-### Metode 1: Instalasi Otomatis (Direkomendasikan)
-1. Pindahkan folder `luai-termux` ke Termux (misalnya via `termux-setup-storage` dari memori internal atau `scp`/`git`).
+### Metode 1: Instalasi Kilat 1 Baris Perintah (Paling Mudah)
+Buka aplikasi **Termux** di Android, lalu jalankan satu baris perintah ini:
+```bash
+curl -sL https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/install.sh | bash
+```
+> Perintah di atas akan mendeteksi arsitektur CPU Android Anda secara otomatis, mengunduh binary Luai, dan langsung memasangnya ke `$PREFIX/bin/luai`.
+
+### Metode 2: Menggunakan Arsip atau Berkas Lokal
+1. Jika Anda sudah memiliki folder `luai-termux` di Termux:
 2. Buka terminal Termux dan masuk ke folder `luai-termux`:
    ```bash
    cd luai-termux

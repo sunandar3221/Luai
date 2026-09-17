@@ -67,14 +67,38 @@ Skrip ini akan:
 
 ---
 
-### 3. Instalasi di Android (Termux)
-Tersedia paket khusus untuk Android Termux di folder `luai-termux/`:
+### 3. Instalasi di Android (Termux) — Tanpa Perlu Build
+
+Anda **TIDAK PERLU** mengompilasi atau build apa pun di Termux karena binary native siap pakai (ARM64 dan x86_64) sudah disediakan secara lengkap.
+
+#### Metode A: Instalasi Kilat 1 Baris Perintah (Direkomendasikan)
+Buka aplikasi **Termux** di perangkat Android Anda, pastikan memiliki koneksi internet, lalu jalankan perintah berikut:
 ```bash
-cd luai-termux
-chmod +x install.sh
-./install.sh
+curl -sL https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/install.sh | bash
 ```
-Binary `luai` akan disalin ke `$PREFIX/bin/luai` dan siap digunakan langsung dari terminal Termux.
+> **Catatan:** Skrip ini otomatis mendeteksi arsitektur CPU perangkat Anda (`aarch64` / `arm64` atau `x86_64`), mengambil binary yang sesuai dari repositori GitHub, memasangnya langsung ke `$PREFIX/bin/luai`, dan memberikannya izin eksekusi.
+
+#### Metode B: Mengunduh Arsip dari GitHub Release
+1. Unduh berkas `luai-termux.tar.gz` langsung dari halaman [GitHub Releases](https://github.com/sunandar3221/Luai/releases):
+   ```bash
+   curl -LO https://github.com/sunandar3221/Luai/releases/download/v1.0.0/luai-termux.tar.gz
+   tar -xzf luai-termux.tar.gz
+   cd luai-termux
+   chmod +x install.sh
+   ./install.sh
+   ```
+
+#### Metode C: Salin Manual Binary Langsung
+Jika Anda menyukai cara manual, Anda bisa langsung mengunduh binary ke folder bin Termux:
+```bash
+# Untuk HP Android (ARM64 / AArch64):
+curl -sL https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/luai-arm64 -o $PREFIX/bin/luai
+chmod +x $PREFIX/bin/luai
+
+# Verifikasi instalasi:
+luai -v
+```
+Ketik `luai` di Termux kapan saja untuk membuka shell interaktif REPL atau `luai skrip.luai` untuk menjalankan program.
 
 ---
 
