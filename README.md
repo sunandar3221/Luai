@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Logo Luai" width="150"/>
+</p>
+
 # Luai - Bahasa Pemrograman Dialek Bahasa Indonesia (dengan JIT Compiler)
 
 **Luai** adalah implementasi bahasa pemrograman dinamis modern berbasis dialek Bahasa Indonesia yang ditenagai oleh **LuaJIT (Just-In-Time Compiler)** berkecepatan tinggi. Seluruh kata kunci resmi, operator logika kata, fungsi bawaan, dan modul standar telah dilokalisasi ke dalam Bahasa Indonesia dengan pemisah garis bawah (`_`) untuk kata majemuk.
