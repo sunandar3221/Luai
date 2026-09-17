@@ -57,49 +57,43 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Install ARM32 Cross-Compiler
+      - name: Install Zig (cross-compiler tanpa konflik apt)
         run: |
-          sudo apt-get update
-          # gcc-13 arm cross-compiler lebih stabil di Ubuntu 24.04
-          sudo apt-get install -y build-essential \
-            gcc-13-arm-linux-gnueabihf g++-13-arm-linux-gnueabihf \
-            gcc-multilib g++-multilib || \
-          sudo apt-get install -y build-essential gcc-multilib g++-multilib \
-            gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+          sudo snap install zig --classic --beta || \
+          (curl -sSL https://ziglang.org/download/index.json | python3 -c "
+          import sys, json, urllib.request, tarfile, os
+          data = json.load(sys.stdin)
+          ver = list(data.keys())[1]  # versi stable
+          url = data[ver]['x86_64-linux']['tarball']
+          print('Mengunduh Zig dari:', url)
+          urllib.request.urlretrieve(url, '/tmp/zig.tar.xz')
+          " && tar -xf /tmp/zig.tar.xz -C /usr/local && \
+          ln -sf /usr/local/zig-*/zig /usr/local/bin/zig)
+          zig version
 
-      - name: Setup ARM32 cross-compiler
+      - name: Install Lua 5.4 source (untuk ARM32 karena LuaJIT butuh HOST_CC -m32)
         run: |
-          # Gunakan versi yang tersedia (13 atau default)
-          if command -v arm-linux-gnueabihf-g++-13 &>/dev/null; then
-            sudo update-alternatives --install /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ $(which arm-linux-gnueabihf-g++-13) 100
-            sudo update-alternatives --install /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc $(which arm-linux-gnueabihf-gcc-13) 100
-          fi
-          arm-linux-gnueabihf-g++ --version
+          # LuaJIT ARM32 cross-build butuh host compiler 32-bit (gcc-multilib)
+          # yang konflik di Ubuntu 24.04. Solusi: pakai Lua 5.4 native static untuk ARM32.
+          curl -sSL https://www.lua.org/ftp/lua-5.4.7.tar.gz | tar -xz
+          echo "Lua 5.4.7 source siap"
 
-      - name: Build LuaJIT for ARM32
+      - name: Build Luai ARM32 dengan Zig CC + Lua 5.4
         run: |
-          make -C luajit/src clean
-          # Cek apakah -m32 tersedia di host gcc
-          if gcc -m32 -x c /dev/null -o /dev/null 2>/dev/null; then
-            HOST32="gcc -m32"
-          else
-            HOST32="gcc"
-          fi
-          echo "Using HOST_CC: $HOST32"
-          make -C luajit/src -j$(nproc) \
-            HOST_CC="$HOST32" \
-            CROSS=arm-linux-gnueabihf- \
-            TARGET_SYS=Linux \
-            BUILDMODE=static \
-            XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
+          LUA_DIR="lua-5.4.7/src"
+          LUA_SRCS=$(ls $LUA_DIR/*.c | grep -v lua.c | grep -v luac.c | tr '\n' ' ')
 
-      - name: Compile Luai ARM32 Binary
-        run: |
-          arm-linux-gnueabihf-g++ -static -O2 -std=c++17 -Iluajit/src \
+          zig c++ \
+            -target arm-linux-musleabihf \
+            -static -O2 -std=c++17 \
+            -DUSE_LUA54 \
+            -I$LUA_DIR \
             src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
-            luajit/src/libluajit.a -o luai-arm32
-          arm-linux-gnueabihf-strip luai-arm32
+            $LUA_SRCS \
+            -o luai-arm32
+
           ls -lh luai-arm32
+          file luai-arm32
 
       - name: Upload ARM32 Artifact
         uses: actions/upload-artifact@v4
