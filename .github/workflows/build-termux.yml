@@ -57,16 +57,41 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Install ARM32 Cross-Compiler & Host 32-bit Support
+      - name: Install ARM32 Cross-Compiler
         run: |
-          sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y build-essential gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libc6-dev-i386
+          # gcc-13 arm cross-compiler lebih stabil di Ubuntu 24.04
+          sudo apt-get install -y build-essential \
+            gcc-13-arm-linux-gnueabihf g++-13-arm-linux-gnueabihf \
+            gcc-multilib g++-multilib || \
+          sudo apt-get install -y build-essential gcc-multilib g++-multilib \
+            gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+
+      - name: Setup ARM32 cross-compiler
+        run: |
+          # Gunakan versi yang tersedia (13 atau default)
+          if command -v arm-linux-gnueabihf-g++-13 &>/dev/null; then
+            sudo update-alternatives --install /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ $(which arm-linux-gnueabihf-g++-13) 100
+            sudo update-alternatives --install /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc $(which arm-linux-gnueabihf-gcc-13) 100
+          fi
+          arm-linux-gnueabihf-g++ --version
 
       - name: Build LuaJIT for ARM32
         run: |
           make -C luajit/src clean
-          make -C luajit/src -j$(nproc) HOST_CC="gcc -m32" CROSS=arm-linux-gnueabihf- TARGET_SYS=Linux BUILDMODE=static XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
+          # Cek apakah -m32 tersedia di host gcc
+          if gcc -m32 -x c /dev/null -o /dev/null 2>/dev/null; then
+            HOST32="gcc -m32"
+          else
+            HOST32="gcc"
+          fi
+          echo "Using HOST_CC: $HOST32"
+          make -C luajit/src -j$(nproc) \
+            HOST_CC="$HOST32" \
+            CROSS=arm-linux-gnueabihf- \
+            TARGET_SYS=Linux \
+            BUILDMODE=static \
+            XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
 
       - name: Compile Luai ARM32 Binary
         run: |
