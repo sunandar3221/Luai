@@ -204,21 +204,16 @@ jobs:
             TAG_NAME="v1.0.0"
           fi
 
-          echo "Mengunggah paket binary ke GitHub Release: $TAG_NAME"
-          gh release upload "$TAG_NAME" \
-            luai-termux/luai-arm64 \
-            luai-termux/luai-arm32 \
-            luai-termux/luai-x86_64 \
-            luai-termux/luai \
-            luai-termux.tar.gz \
-            luai-termux.zip \
-            --clobber || true
+          # Upload semua sekaligus (1 panggilan = lebih cepat dari per-file)
+          FILES="luai-termux/luai-arm64 luai-termux/luai-arm32 luai-termux/luai-x86_64 luai-termux/luai luai-termux.tar.gz luai-termux.zip"
 
-          gh release upload "BINARY" \
-            luai-termux/luai-arm64 \
-            luai-termux/luai-arm32 \
-            luai-termux/luai-x86_64 \
-            luai-termux/luai \
-            luai-termux.tar.gz \
-            luai-termux.zip \
-            --clobber 2>/dev/null || true
+          echo ">>> Upload ke release: $TAG_NAME"
+          gh release upload "$TAG_NAME" $FILES --clobber || true
+
+          # Upload ke BINARY di background (paralel) agar tidak blocking
+          echo ">>> Upload ke release: BINARY (background)"
+          gh release upload "BINARY" $FILES --clobber 2>/dev/null &
+
+          # Tunggu background upload selesai
+          wait
+          echo ">>> Semua upload selesai!"
