@@ -1,0 +1,12 @@
+lokal nama = dasar.masukan("Masukkan nama: ")
+lokal usia = io.masukan("Masukkan usia: ")
+lokal kota = io.minta("Masukkan kota: ")
+lokal hobi = io.tanya("Masukkan hobi: ")
+lokal alamat = io.baca("Masukkan alamat: ")
+
+dasar.cetak("--- Hasil Input Pengguna ---")
+dasar.cetak("Nama   :", nama)
+dasar.cetak("Usia   :", usia)
+dasar.cetak("Kota   :", kota)
+dasar.cetak("Hobi   :", hobi)
+dasar.cetak("Alamat :", alamat)

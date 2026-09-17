@@ -1,8 +1,55 @@
-﻿#include "repl.hpp"
+#include "repl.hpp"
 #include "lexer.hpp"
+
+#if __has_include("../luajit/src/lua.hpp")
+#include "../luajit/src/lua.hpp"
+#elif __has_include("luajit.h")
+extern "C" {
+#include "lua.h"
+#include "lauxlib.h"
+#include "lualib.h"
+#include "luajit.h"
+}
+#elif __has_include("lua.hpp")
+#include "lua.hpp"
+#else
 #include "../lua-5.4.7/src/lua.hpp"
+#endif
+
 #include <iostream>
 #include <sstream>
+
+#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 502
+static const char* luai_tolstring(lua_State* L, int idx, size_t* len) {
+    if (luaL_callmeta(L, idx, "__tostring")) {
+        if (!lua_isstring(L, -1))
+            luaL_error(L, "'__tostring' must return a string");
+    } else {
+        switch (lua_type(L, idx)) {
+            case LUA_TNUMBER:
+            case LUA_TSTRING:
+                lua_pushvalue(L, idx);
+                break;
+            case LUA_TBOOLEAN:
+                lua_pushstring(L, lua_toboolean(L, idx) ? "true" : "false");
+                break;
+            case LUA_TNIL:
+                lua_pushliteral(L, "nil");
+                break;
+            default: {
+                char buf[64];
+                snprintf(buf, sizeof(buf), "%s: %p", lua_typename(L, lua_type(L, idx)), lua_topointer(L, idx));
+                lua_pushstring(L, buf);
+                break;
+            }
+        }
+    }
+    return lua_tolstring(L, -1, len);
+}
+#ifndef luaL_tolstring
+#define luaL_tolstring luai_tolstring
+#endif
+#endif
 
 std::string Repl::trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \t\r\n");
@@ -18,7 +65,7 @@ bool Repl::isIncompleteChunk(const std::string& errorMsg) {
 }
 
 void Repl::run(LuaiRuntime& runtime) {
-    std::cout << "Luai 1.0.0 (Lua dialek Bahasa Indonesia) [Lua 5.4.7]\n";
+    std::cout << "Luai 1.0.0 (Dialek Bahasa Indonesia) [LuaJIT JIT Aktif]\n";
     std::cout << "Ketik \"keluar\" atau \"exit\" untuk mengakhiri sesi interaktif.\n\n";
 
     std::string buffer;

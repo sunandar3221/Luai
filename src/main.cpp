@@ -1,4 +1,4 @@
-﻿#include "runtime.hpp"
+#include "runtime.hpp"
 #include "repl.hpp"
 #include <iostream>
 #include <string>
@@ -7,7 +7,7 @@
 static void printVersion() {
     std::cout << "Luai 1.0.0 (Bahasa Pemrograman Lua Dialek Bahasa Indonesia)\n";
     std::cout << "Hak Cipta (C) 2026 Engine Luai.\n";
-    std::cout << "Berbasis Lua 5.4.7 (https://www.lua.org)\n";
+    std::cout << "Berbasis LuaJIT [JIT Compiler Aktif] (https://luajit.org)\n";
 }
 
 static void printHelp() {

@@ -1,4 +1,4 @@
-﻿#ifndef LUAI_RUNTIME_HPP
+#ifndef LUAI_RUNTIME_HPP
 #define LUAI_RUNTIME_HPP
 
 #include <string>
@@ -25,6 +25,7 @@ private:
 
     void registerIndonesianBindings();
     void registerModuleAliases();
+    void registerDasarLibrary();
     void registerSearcher();
     static int luaiSearcher(lua_State* L);
 };

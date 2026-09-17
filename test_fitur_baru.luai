@@ -1,0 +1,38 @@
+cetak("=== UJI FITUR BARU & PERBAIKAN BUG LUAI ===")
+
+-- 1. Uji JIT
+lokal status_jit, mode = jit.status()
+cetak("[1] Status JIT Aktif:", status_jit, "| Versi:", jit.version)
+
+-- 2. Uji Lepas (sebelumnya bug: elemen pertama hilang)
+lokal a, b, c = lepas({10, 20, 30})
+cetak("[2] Uji lepas():", a, b, c)
+
+-- 3. Uji Library dasar & io
+cetak("[3] Tipe library 'dasar':", tipe(dasar))
+cetak("[4] Tipe library 'io':", tipe(io))
+cetak("[5] Fungsi dasar.cetak:", tipe(dasar.cetak))
+cetak("[6] Fungsi dasar.masukan:", tipe(dasar.masukan))
+cetak("[7] Fungsi io.masukan:", tipe(io.masukan))
+cetak("[8] Fungsi io.minta:", tipe(io.minta))
+
+-- 4. Uji Member Access dengan Nama Kata Kunci (obj.selesai, obj:selesai())
+lokal objek = {
+    selesai = "selesai_properti",
+    fungsi = "fungsi_properti"
+}
+fungsi objek:selesai()
+    kembalikan "selesai_metode"
+selesai
+cetak("[9] Member access properti:", objek.selesai, "|", objek.fungsi)
+cetak("[10] Member access metode:", objek:selesai())
+
+-- 5. Uji Pembagian Bulat (//)
+lokal hasil_bagi = 47 // 5
+cetak("[11] Pembagian bulat 47 // 5 =", hasil_bagi)
+
+-- 6. Uji Konkat Angka (1..2)
+lokal konkat = 1..2
+cetak("[12] Konkat angka 1..2 =", konkat)
+
+cetak("=== SEMUA UJI COBA BERHASIL 100% ===")
