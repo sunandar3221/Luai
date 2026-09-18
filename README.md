@@ -14,12 +14,13 @@ Dengan integrasi JIT Compiler, eksekusi kode Luai berjalan sangat cepat setara d
 1. [Fitur Utama](#fitur-utama)
 2. [Langkah-Langkah Instalasi](#langkah-langkah-instalasi)
 3. [Panduan Penggunaan Interpreter (Cara Pakai)](#panduan-penggunaan-interpreter-cara-pakai)
-4. [Tutorial Kilat Luai (Crash Course 5 Menit)](#tutorial-kilat-luai-crash-course-5-menit)
-5. [Tabel Kamus Sintaks Resmi (22 Kata Kunci)](#tabel-kamus-sintaks-resmi-22-kata-kunci)
-6. [Fungsi Bawaan Global & Input Pengguna (`io`)](#fungsi-bawaan-global--input-pengguna-io)
-7. [Modul Terjemahan Lainnya](#modul-terjemahan-lainnya)
-8. [Ekstensi Editor & IDE](#ekstensi-editor--ide)
-9. [Struktur Direktori Proyek](#struktur-direktori-proyek)
+4. [Konversi Kode Dua Arah (Luai <-> Lua Standar)](#konversi-kode-dua-arah-luai---lua-standar)
+5. [Tutorial Kilat Luai (Crash Course 5 Menit)](#tutorial-kilat-luai-crash-course-5-menit)
+6. [Tabel Kamus Sintaks Resmi (22 Kata Kunci)](#tabel-kamus-sintaks-resmi-22-kata-kunci)
+7. [Fungsi Bawaan Global & Input Pengguna (`io`)](#fungsi-bawaan-global--input-pengguna-io)
+8. [Modul Terjemahan Lainnya](#modul-terjemahan-lainnya)
+9. [Ekstensi Editor & IDE](#ekstensi-editor--ide)
+10. [Struktur Direktori Proyek](#struktur-direktori-proyek)
 
 ---
 
@@ -152,38 +153,104 @@ Jalankan skrip terlebih dahulu, lalu masuk ke REPL dengan status lingkungan skri
 .\luai.exe -i skrip.luai
 ```
 
-### 5. Mode Konversi Kode (Luai <-> Lua Standar) [FITUR BARU v1.0.1]
-Luai menyediakan alat konverter dua arah bawaan untuk mentranslasikan kode antara dialek Luai dan Lua standar secara instan:
-
-- **Konversi Luai ke Lua Standar** (`--ke-lua` atau `--to-lua`):
-  ```powershell
-  # Konversi berkas dan tampilkan ke layar terminal:
-  luai --ke-lua program.luai
-
-  # Konversi berkas dan simpan ke file tujuan (.lua):
-  luai --ke-lua program.luai -o program.lua
-
-  # Konversi langsung dari satu baris kode (inline):
-  luai --ke-lua -e "fungsi sapa(nama) cetak('Halo ' .. nama) selesai"
-  ```
-
-- **Konversi Lua Standar ke Luai** (`--ke-luai` atau `--to-luai`):
-  ```powershell
-  # Konversi berkas Lua ke Luai dan tampilkan ke layar:
-  luai --ke-luai program.lua
-
-  # Konversi berkas dan simpan ke file tujuan (.luai):
-  luai --ke-luai program.lua -o program.luai
-
-  # Konversi langsung dari satu baris kode (inline):
-  luai --ke-luai -e "function sapa(nama) print('Halo ' .. nama) end"
-  ```
-
-### 6. Memeriksa Versi & Bantuan
+### 5. Memeriksa Versi & Bantuan
 ```powershell
 .\luai.exe -v
 .\luai.exe -h
 ```
+
+---
+
+## Konversi Kode Dua Arah (Luai <-> Lua Standar)
+
+Mulai **versi 1.0.1**, interpreter Luai dilengkapi dengan alat penerjemah dua arah (*bidirectional code transpiler*) bawaan. Fitur ini memungkinkan Anda:
+1. **Mengekspor program Luai ke Lua standar** agar dapat dijalankan pada lingkungan atau game engine yang hanya mendukung Lua murni (seperti Roblox Studio, Defold, LÖVE2D, OpenResty, atau NodeMCU).
+2. **Mengimpor pustaka atau skrip Lua standar ke Luai** agar dapat dipelajari atau dikembangkan dengan gaya sintaks Bahasa Indonesia yang mudah dibaca.
+
+> 💡 **Aman & Akurat**: Transpiler Luai bekerja pada level *lexer tokenizer*. Ini berarti teks di dalam tanda kutip (string literal seperti `"fungsi ini selesai"`) dan komentar (`-- komentar`) akan **tetap terlindungi** dan tidak akan ikut terjemah secara salah.
+
+---
+
+### 1. Mengubah Kode Luai ke Lua Standar (`--ke-lua` / `--to-lua`)
+
+Gunakan opsi `--ke-lua` (atau alias `--to-lua` / `--luai-ke-lua`) untuk mengubah dialek Bahasa Indonesia menjadi sintaks resmi Lua:
+
+#### A. Menampilkan Hasil Konversi Langsung di Terminal
+Cocok untuk inspeksi cepat atau menyalurkan output (*pipe*) ke program lain:
+```powershell
+# Windows
+.\luai.exe --ke-lua skrip.luai
+
+# Android Termux / Linux
+luai --ke-lua skrip.luai
+```
+
+#### B. Menyimpan Hasil Konversi ke Berkas `.lua` Baru
+Tambahkan opsi `-o nama_berkas_tujuan.lua`:
+```powershell
+# Mengonversi 'program.luai' dan menyimpannya menjadi 'program.lua'
+.\luai.exe --ke-lua program.luai -o program.lua
+```
+
+#### C. Mengonversi Sebaris Kode Secara Langsung (Mode `-e`)
+Gunakan opsi `-e` diikuti sebaris kode Luai:
+```powershell
+.\luai.exe --ke-lua -e "fungsi sapa(nama) cetak('Halo, ' .. nama) selesai"
+```
+*Keluaran terminal:*
+```lua
+function sapa(nama) print('Halo, ' .. nama) end
+```
+
+---
+
+### 2. Mengubah Kode Lua Standar ke Luai (`--ke-luai` / `--to-luai`)
+
+Gunakan opsi `--ke-luai` (atau alias `--to-luai` / `--lua-ke-luai`) untuk mengubah skrip Lua standar menjadi dialek Bahasa Indonesia:
+
+#### A. Menampilkan Hasil Konversi Langsung di Terminal
+```powershell
+# Windows
+.\luai.exe --ke-luai kode_lama.lua
+
+# Android Termux / Linux
+luai --ke-luai kode_lama.lua
+```
+
+#### B. Menyimpan Hasil Konversi ke Berkas `.luai` Baru
+Tambahkan opsi `-o nama_berkas_tujuan.luai`:
+```powershell
+# Mengonversi 'modul.lua' dan menyimpannya menjadi 'modul.luai'
+.\luai.exe --ke-luai modul.lua -o modul.luai
+```
+
+#### C. Mengonversi Sebaris Kode Secara Langsung (Mode `-e`)
+Gunakan opsi `-e` diikuti sebaris kode Lua standar:
+```powershell
+.\luai.exe --ke-luai -e "for i = 1, 5 do print('Hitungan: ' .. i) end"
+```
+*Keluaran terminal:*
+```lua
+untuk i = 1, 5 lakukan cetak('Hitungan: ' .. i) selesai
+```
+
+---
+
+### 3. Tabel Contoh Nyata: Sebelum & Sesudah Konversi
+
+Berikut perbandingan kode utuh saat ditranslasikan bolak-balik:
+
+#### Contoh: Fungsi Perhitungan dan Pengambilan Keputusan
+| Kode Luai (`program.luai`) | Kode Hasil Konversi Lua Standar (`program.lua`) |
+|---|---|
+| ```lua<br>lokal fungsi cek_status(nilai)<br>    jika nilai >= 75 maka<br>        kembalikan "Lulus"<br>    selain_jika nilai >= 60 maka<br>        kembalikan "Remedial"<br>    selain_itu<br>        kembalikan "Gagal"<br>    selesai<br>selesai<br><br>untuk i = 1, 3 lakukan<br>    cetak("Siswa " .. i .. ": " .. cek_status(70))<br>selesai<br>``` | ```lua<br>local function cek_status(nilai)<br>    if nilai >= 75 then<br>        return "Lulus"<br>    elseif nilai >= 60 then<br>        return "Remedial"<br>    else<br>        return "Gagal"<br>    end<br>end<br><br>for i = 1, 3 do<br>    print("Siswa " .. i .. ": " .. cek_status(70))<br>end<br>``` |
+
+#### Elemen yang Otomatis Diterjemahkan:
+- **22 Kata Kunci Bahasa**: `lokal` <-> `local`, `fungsi` <-> `function`, `jika` <-> `if`, `maka` <-> `then`, `selesai` <-> `end`, `lakukan` <-> `do`, `untuk` <-> `for`, `selama` <-> `while`, `kembalikan` <-> `return`, dll.
+- **Fungsi Global Standar**: `cetak` <-> `print`, `tipe` <-> `type`, `ke_angka` <-> `tonumber`, `ke_teks` <-> `tostring`, `pasangan` <-> `pairs`, `urutan` <-> `ipairs`, `tegaskan` <-> `assert`, dll.
+- **Nama Modul Bawaan**: `matematika` <-> `math`, `tabel` <-> `table`, `teks` <-> `string`, `berkas` <-> `io`, `sistem` <-> `os`.
+- **Nilai Literal Khusus**: `benar` <-> `true`, `salah` <-> `false`, `nihil` <-> `nil`.
+
 
 ---
 
