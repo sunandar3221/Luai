@@ -22,6 +22,8 @@ extern "C" {
 #include <cmath>
 #include <cctype>
 #include <cstdio>
+#include <cstring>
+#include <string.h>
 #include <cstdint>
 #include <algorithm>
 
@@ -523,17 +525,17 @@ static bool parseValue(lua_State* L, DecodeContext& ctx, std::string& err) {
     }
 
     // Literals: true, false, null
-    if (ctx.pos + 4 <= ctx.len && std::memcmp(ctx.src + ctx.pos, "true", 4) == 0) {
+    if (ctx.pos + 4 <= ctx.len && memcmp(ctx.src + ctx.pos, "true", 4) == 0) {
         ctx.pos += 4; ctx.col += 4;
         lua_pushboolean(L, 1);
         return true;
     }
-    if (ctx.pos + 5 <= ctx.len && std::memcmp(ctx.src + ctx.pos, "false", 5) == 0) {
+    if (ctx.pos + 5 <= ctx.len && memcmp(ctx.src + ctx.pos, "false", 5) == 0) {
         ctx.pos += 5; ctx.col += 5;
         lua_pushboolean(L, 0);
         return true;
     }
-    if (ctx.pos + 4 <= ctx.len && std::memcmp(ctx.src + ctx.pos, "null", 4) == 0) {
+    if (ctx.pos + 4 <= ctx.len && memcmp(ctx.src + ctx.pos, "null", 4) == 0) {
         ctx.pos += 4; ctx.col += 4;
         // Dorong json.null
         lua_getglobal(L, "json");
