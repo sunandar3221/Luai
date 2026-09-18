@@ -552,17 +552,51 @@ Luai menyediakan seluruh fungsi inti bahasa secara global langsung tanpa awalan 
 - `sistem.hapus(nama_file)`: Menghapus file dari disk (`remove`)
 - `sistem.ganti_nama(lama, baru)`: Mengubah nama file (`rename`)
 
-### 5. Modul `io`
-- `io.masukan(pesan)`: Meminta dan membaca input baris dari pengguna.
-- `io.minta(pesan)` / `io.tanya(pesan)`: Alias untuk meminta masukan pengguna.
-- `io.baca([format_atau_pesan])`: Membaca masukan pengguna atau stream file.
-- `io.tulis(...)`: Menulis ke terminal / keluaran standar (`write`).
-- `io.buka(nama_file, [mode])`: Membuka file (`open`).
-- `io.tutup([file])`: Menutup file handler (`close`).
-- `io.siram()`: Membilas buffer keluaran (`flush`).
-- `io.baris([nama_file])`: Iterator membaca baris per baris (`lines`).
-- `io.berkas_masukan([file])`: Mengatur file masukan *default* (`input`).
-- `io.berkas_keluaran([file])`: Mengatur file keluaran *default* (`output`).
+### 5. Modul `berkas` & `io` (Operasi File & Input/Output)
+Luai menyediakan modul `berkas` (alias resmi Bahasa Indonesia untuk `io`) serta dukungan penuh metode objek berkas (`file handle`):
+
+#### A. Fungsi Modul `berkas` / `io`
+- `berkas.buka(nama_file, [mode])` / `io.buka`: Membuka file (`open`).
+- `berkas.masukan(pesan)` / `io.masukan`: Meminta dan membaca input baris dari pengguna.
+- `berkas.minta(pesan)` / `berkas.tanya(pesan)`: Alias meminta masukan pengguna.
+- `berkas.baca([format_atau_pesan])`: Membaca masukan pengguna atau stream file.
+- `berkas.tulis(...)`: Menulis ke terminal / stream keluaran standar (`write`).
+- `berkas.siram()` / `berkas.bilas()`: Membilas buffer keluaran (`flush`).
+- `berkas.tutup([file])`: Menutup handler berkas (`close`).
+- `berkas.baris([nama_file])`: Iterator membaca baris per baris (`lines`).
+- `berkas.berkas_masukan([file])`: Mengatur file masukan bawaan (`input`).
+- `berkas.berkas_keluaran([file])`: Mengatur file keluaran bawaan (`output`).
+- `berkas.file_sementara()`: Membuat file temporer (`tmpfile`).
+
+#### B. Metode Objek Berkas (`file:method` / `berkas:metode`)
+Setelah berkas dibuka dengan `lokal f = berkas.buka("nama.txt", "w")`, seluruh metode file handle dapat dipanggil dengan dialek Bahasa Indonesia:
+
+| Metode Luai | Metode Lua Asli | Keterangan & Penjelasan |
+|:---|:---|:---|
+| `f:tulis(...)` | `f:write(...)` | Menulis data teks atau angka ke dalam file |
+| `f:baca(...)` | `f:read(...)` | Membaca isi file (misal `"*semua"`, `"*a"`, `"*l"`, atau angka byte) |
+| `f:tutup()` | `f:close()` | Menutup berkas dan melepaskan resource |
+| `f:siram()` / `f:bilas()` | `f:flush()` | Membilas buffer data ke penyimpanan disk |
+| `f:baris()` | `f:lines()` | Iterator membaca file per baris dalam loop `untuk` |
+| `f:geser(...)` / `f:posisi(...)` | `f:seek(...)` | Memindahkan posisi kursor baca/tulis di file |
+| `f:atur_buffer(...)` | `f:setvbuf(...)` | Mengatur mode buffering (`"no"`, `"full"`, `"line"`) |
+
+**Contoh Menulis & Membaca Berkas:**
+```lua
+-- 1. Menulis ke berkas
+lokal f = berkas.buka("pesan.txt", "w")
+f:tulis("Halo dari Luai!\n")
+f:tulis("Bahasa dialek Indonesia ditenagai LuaJIT.\n")
+f:bilas()
+f:tutup()
+
+-- 2. Membaca berkas per baris
+lokal baca_f = berkas.buka("pesan.txt", "r")
+untuk baris dalam baca_f:baris() lakukan
+    cetak("Baris:", baris)
+selesai
+baca_f:tutup()
+```
 
 ### 6. Modul `korutin` (`coroutine`)
 - `korutin.buat(fungsi)`: Membuat instance korutin baru (`create`)

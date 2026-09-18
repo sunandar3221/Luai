@@ -61,6 +61,9 @@ static const char* luai_tolstring(lua_State* L, int idx, size_t* len) {
 #ifndef lua_rawlen
 #define lua_rawlen(L, i) lua_objlen(L, (i))
 #endif
+#ifndef lua_absindex
+#define lua_absindex(L, i) ((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : lua_gettop(L) + (i) + 1)
+#endif
 #endif
 
 static int luai_cetak(lua_State* L) {
@@ -533,8 +536,17 @@ void LuaiRuntime::registerModuleAliases() {
             {"buka", "open"},
             {"tutup", "close"},
             {"siram", "flush"},
+            {"bilas", "flush"},
             {"baris", "lines"},
-            {"tipe", "type"}
+            {"tipe", "type"},
+            {"geser", "seek"},
+            {"posisi", "seek"},
+            {"cari_posisi", "seek"},
+            {"atur_buffer", "setvbuf"},
+            {"set_buffer", "setvbuf"},
+            {"setel_buffer", "setvbuf"},
+            {"file_sementara", "tmpfile"},
+            {"berkas_sementara", "tmpfile"}
         };
         for (const auto& p : ioAliases) {
             lua_getfield(L, -1, p.second);
@@ -544,6 +556,95 @@ void LuaiRuntime::registerModuleAliases() {
                 lua_pop(L, 1);
             }
         }
+    }
+    lua_pop(L, 1);
+
+    // Salin io ke modul berkas
+    copyAndEnhance("io", "berkas", {
+        {"tulis", "write"},
+        {"buka", "open"},
+        {"tutup", "close"},
+        {"siram", "flush"},
+        {"bilas", "flush"},
+        {"baris", "lines"},
+        {"tipe", "type"},
+        {"geser", "seek"},
+        {"posisi", "seek"},
+        {"cari_posisi", "seek"},
+        {"atur_buffer", "setvbuf"},
+        {"set_buffer", "setvbuf"},
+        {"setel_buffer", "setvbuf"},
+        {"file_sementara", "tmpfile"},
+        {"berkas_sementara", "tmpfile"}
+    });
+
+    // Daftarkan method Bahasa Indonesia pada file handle metatable (file:tulis, file:baca, file:tutup, dll.)
+    auto enhanceFileMeta = [](lua_State* L, int metaIdx) {
+        if (!lua_istable(L, metaIdx)) return;
+        metaIdx = lua_absindex(L, metaIdx);
+
+        std::vector<std::pair<const char*, const char*>> fileMethodAliases = {
+            {"tulis", "write"},
+            {"baca", "read"},
+            {"tutup", "close"},
+            {"siram", "flush"},
+            {"bilas", "flush"},
+            {"baris", "lines"},
+            {"geser", "seek"},
+            {"posisi", "seek"},
+            {"cari_posisi", "seek"},
+            {"atur_buffer", "setvbuf"},
+            {"set_buffer", "setvbuf"},
+            {"setel_buffer", "setvbuf"}
+        };
+
+        lua_getfield(L, metaIdx, "__index");
+        int targetIdx = metaIdx;
+        bool popIndex = false;
+        if (lua_istable(L, -1)) {
+            targetIdx = lua_gettop(L);
+            popIndex = true;
+        } else {
+            lua_pop(L, 1);
+        }
+
+        for (const auto& p : fileMethodAliases) {
+            lua_getfield(L, targetIdx, p.second);
+            if (!lua_isnil(L, -1)) {
+                lua_setfield(L, targetIdx, p.first);
+                if (targetIdx != metaIdx) {
+                    lua_getfield(L, targetIdx, p.first);
+                    lua_setfield(L, metaIdx, p.first);
+                }
+            } else {
+                lua_pop(L, 1);
+            }
+        }
+
+        if (popIndex) {
+            lua_pop(L, 1);
+        }
+    };
+
+    #ifndef LUA_FILEHANDLE
+    #define LUA_FILEHANDLE "FILE*"
+    #endif
+    luaL_getmetatable(L, LUA_FILEHANDLE);
+    if (lua_istable(L, -1)) {
+        enhanceFileMeta(L, -1);
+    }
+    lua_pop(L, 1);
+
+    lua_getglobal(L, "io");
+    if (lua_istable(L, -1)) {
+        lua_getfield(L, -1, "stdout");
+        if (!lua_isnil(L, -1)) {
+            if (lua_getmetatable(L, -1)) {
+                enhanceFileMeta(L, -1);
+                lua_pop(L, 1);
+            }
+        }
+        lua_pop(L, 1);
     }
     lua_pop(L, 1);
 

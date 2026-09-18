@@ -30,6 +30,8 @@ private:
     static const std::unordered_map<std::string, std::string>& getLuaToLuaiModuleMap();
     static const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& getLuaiToLuaMemberMap();
     static const std::unordered_map<std::string, std::unordered_map<std::string, std::string>>& getLuaToLuaiMemberMap();
+    static const std::unordered_map<std::string, std::string>& getLuaiToLuaMethodMap();
+    static const std::unordered_map<std::string, std::string>& getLuaToLuaiMethodMap();
 };
 
 #endif

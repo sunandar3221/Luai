@@ -355,6 +355,66 @@ const std::unordered_map<std::string, std::unordered_map<std::string, std::strin
     return map;
 }
 
+const std::unordered_map<std::string, std::string>& Lexer::getLuaiToLuaMethodMap() {
+    static const std::unordered_map<std::string, std::string> map = {
+        // File / Berkas handle methods
+        {"tulis", "write"},
+        {"baca", "read"},
+        {"tutup", "close"},
+        {"siram", "flush"},
+        {"bilas", "flush"},
+        {"baris", "lines"},
+        {"geser", "seek"},
+        {"posisi", "seek"},
+        {"cari_posisi", "seek"},
+        {"atur_buffer", "setvbuf"},
+        {"set_buffer", "setvbuf"},
+        {"setel_buffer", "setvbuf"},
+        // String methods
+        {"panjang", "len"},
+        {"huruf_besar", "upper"},
+        {"huruf_kecil", "lower"},
+        {"potong", "sub"},
+        {"cari", "find"},
+        {"ganti", "gsub"},
+        {"cocok", "match"},
+        {"format", "format"},
+        {"ulang", "rep"},
+        {"balik", "reverse"},
+        {"karakter", "char"},
+        {"byte", "byte"}
+    };
+    return map;
+}
+
+const std::unordered_map<std::string, std::string>& Lexer::getLuaToLuaiMethodMap() {
+    static const std::unordered_map<std::string, std::string> map = {
+        // File / Berkas handle methods
+        {"write", "tulis"},
+        {"read", "baca"},
+        {"close", "tutup"},
+        {"flush", "siram"},
+        {"lines", "baris"},
+        {"seek", "geser"},
+        {"setvbuf", "atur_buffer"},
+        // String methods
+        {"len", "panjang"},
+        {"upper", "huruf_besar"},
+        {"lower", "huruf_kecil"},
+        {"sub", "potong"},
+        {"find", "cari"},
+        {"gsub", "ganti"},
+        {"match", "cocok"},
+        {"format", "format"},
+        {"rep", "ulang"},
+        {"reverse", "balik"},
+        {"char", "karakter"},
+        {"byte", "byte"}
+    };
+    return map;
+}
+
+
 // ---------------------------------------------------------------------------
 // Transpile untuk eksekusi runtime internal
 // ---------------------------------------------------------------------------
@@ -662,6 +722,7 @@ std::string Lexer::toLua(const std::string& source) {
     const auto& globalMap = getLuaiToLuaGlobalMap();
     const auto& moduleMap = getLuaiToLuaModuleMap();
     const auto& memberMap = getLuaiToLuaMemberMap();
+    const auto& methodMap = getLuaiToLuaMethodMap();
 
     while (i < n) {
         // Shebang
@@ -935,7 +996,14 @@ std::string Lexer::toLua(const std::string& source) {
                 isTableKey = true;
             }
 
-            if (isDotAccess && !parentObj.empty()) {
+            if (isColonAccess) {
+                auto methodIt = methodMap.find(ident);
+                if (methodIt != methodMap.end()) {
+                    result += methodIt->second;
+                    continue;
+                }
+                result += ident;
+            } else if (isDotAccess && !parentObj.empty()) {
                 // Cek apakah parentObj adalah modul standar yang dikenali
                 auto modIt = memberMap.find(parentObj);
                 if (modIt != memberMap.end()) {
@@ -999,6 +1067,7 @@ std::string Lexer::toLuai(const std::string& source) {
     const auto& globalMap = getLuaToLuaiGlobalMap();
     const auto& moduleMap = getLuaToLuaiModuleMap();
     const auto& memberMap = getLuaToLuaiMemberMap();
+    const auto& methodMap = getLuaToLuaiMethodMap();
 
     while (i < n) {
         // Shebang
@@ -1199,7 +1268,14 @@ std::string Lexer::toLuai(const std::string& source) {
                 isTableKey = true;
             }
 
-            if (isDotAccess && !parentObj.empty()) {
+            if (isColonAccess) {
+                auto methodIt = methodMap.find(ident);
+                if (methodIt != methodMap.end()) {
+                    result += methodIt->second;
+                    continue;
+                }
+                result += ident;
+            } else if (isDotAccess && !parentObj.empty()) {
                 // Cek apakah parentObj adalah modul standar Luai
                 auto modIt = memberMap.find(parentObj);
                 if (modIt != memberMap.end()) {
