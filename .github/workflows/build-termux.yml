@@ -54,7 +54,7 @@ jobs:
       - name: Compile Luai Windows Binary
         shell: bash
         run: |
-          g++ -static -O2 -std=c++17 -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp luajit/src/libluajit.a -o luai.exe
+          g++ -static -O2 -std=c++17 -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/json_module.cpp src/http_module.cpp src/main.cpp luajit/src/libluajit.a -lwinhttp -o luai.exe
           ./luai.exe -v
 
       - name: Package VS Code Extension
@@ -111,7 +111,7 @@ jobs:
       - name: Compile Luai ARM64 Binary
         run: |
           $TOOLCHAIN/aarch64-linux-android24-clang++ -O2 -std=c++17 -static-libstdc++ \
-            -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+            -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/json_module.cpp src/http_module.cpp src/main.cpp \
             luajit/src/libluajit.a -o luai-arm64
           $TOOLCHAIN/llvm-strip luai-arm64
           ls -lh luai-arm64
@@ -161,7 +161,7 @@ jobs:
           LUA_DIR="lua-5.4.7/src"
           LUA_OBJS=$(ls "$LUA_DIR"/*.o)
           $TOOLCHAIN/armv7a-linux-androideabi24-clang++ -O2 -std=c++17 -DUSE_LUA54 -static-libstdc++ \
-            -I"$LUA_DIR" src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+            -I"$LUA_DIR" src/lexer.cpp src/runtime.cpp src/repl.cpp src/json_module.cpp src/http_module.cpp src/main.cpp \
             $LUA_OBJS -o luai-arm32
           $TOOLCHAIN/llvm-strip luai-arm32
           ls -lh luai-arm32
@@ -206,7 +206,7 @@ jobs:
       - name: Compile Luai x86_64 Binary
         run: |
           $TOOLCHAIN/x86_64-linux-android24-clang++ -O2 -std=c++17 -static-libstdc++ \
-            -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+            -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/json_module.cpp src/http_module.cpp src/main.cpp \
             luajit/src/libluajit.a -o luai-x86_64
           $TOOLCHAIN/llvm-strip luai-x86_64
           ls -lh luai-x86_64

@@ -1,5 +1,7 @@
 #include "runtime.hpp"
 #include "lexer.hpp"
+#include "json_module.hpp"
+#include "http_module.hpp"
 
 #if defined(USE_LUA54)
 #include "lua.hpp"
@@ -330,6 +332,8 @@ bool LuaiRuntime::init() {
     }
 
     luaL_openlibs(L);
+    luai_register_json_module(L);
+    luai_register_http_module(L);
     registerIndonesianBindings();
     registerModuleAliases();
     registerSearcher();

@@ -19,7 +19,7 @@ if not exist luajit\src\libluajit.a (
 )
 
 echo [2/2] Mengompilasi Interpreter Luai (luai.exe)...
-g++ -static -O2 -std=c++17 -Iluajit\src src\lexer.cpp src\runtime.cpp src\repl.cpp src\main.cpp luajit\src\libluajit.a -o luai.exe
+g++ -static -O2 -std=c++17 -Iluajit\src src\lexer.cpp src\runtime.cpp src\repl.cpp src\json_module.cpp src\http_module.cpp src\main.cpp luajit\src\libluajit.a -lwinhttp -o luai.exe
 
 if %errorlevel% equ 0 (
     echo [Sukses] luai.exe berhasil dibangun!

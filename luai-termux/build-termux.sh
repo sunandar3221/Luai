@@ -220,7 +220,7 @@ link_binary() {
     fi
 
     args+=("-DLUAI_BUILD_PLATFORM=\"$TRIPLE (musl static, $label)\"")
-    objs+=("$SRC_DIR/lexer.cpp" "$SRC_DIR/runtime.cpp" "$SRC_DIR/repl.cpp" "$SRC_DIR/main.cpp")
+    objs+=("$SRC_DIR/lexer.cpp" "$SRC_DIR/runtime.cpp" "$SRC_DIR/repl.cpp" "$SRC_DIR/json_module.cpp" "$SRC_DIR/http_module.cpp" "$SRC_DIR/main.cpp")
 
     if [ "$engine" = "luajit" ]; then
         args+=(-I"$LJ_DIR")

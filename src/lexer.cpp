@@ -131,7 +131,10 @@ const std::unordered_map<std::string, std::string>& Lexer::getLuaiToLuaModuleMap
         {"teks", "string"},
         {"sistem", "os"},
         {"korutin", "coroutine"},
-        {"io", "io"}
+        {"io", "io"},
+        {"json", "json"},
+        {"https", "https"},
+        {"http", "http"}
     };
     return map;
 }
@@ -143,7 +146,10 @@ const std::unordered_map<std::string, std::string>& Lexer::getLuaToLuaiModuleMap
         {"string", "teks"},
         {"os", "sistem"},
         {"coroutine", "korutin"},
-        {"io", "io"}
+        {"io", "io"},
+        {"json", "json"},
+        {"https", "https"},
+        {"http", "http"}
     };
     return map;
 }
@@ -223,6 +229,30 @@ const std::unordered_map<std::string, std::unordered_map<std::string, std::strin
             {"baca", "read"},
             {"berkas_masukan", "input"},
             {"berkas_keluaran", "output"}
+        }},
+        {"json", {
+            {"kodekan", "encode"},
+            {"tulis", "encode"},
+            {"ke_json", "encode"},
+            {"uraikan", "decode"},
+            {"baca", "decode"},
+            {"dari_json", "decode"},
+            {"uraikan_aman", "decode_safe"},
+            {"nihil", "null"}
+        }},
+        {"https", {
+            {"ambil", "get"},
+            {"kirim", "post"},
+            {"taruh", "put"},
+            {"hapus", "delete"},
+            {"permintaan", "request"}
+        }},
+        {"http", {
+            {"ambil", "get"},
+            {"kirim", "post"},
+            {"taruh", "put"},
+            {"hapus", "delete"},
+            {"permintaan", "request"}
         }}
     };
     return map;
@@ -300,6 +330,26 @@ const std::unordered_map<std::string, std::unordered_map<std::string, std::strin
             {"read", "masukan"},
             {"input", "berkas_masukan"},
             {"output", "berkas_keluaran"}
+        }},
+        {"json", {
+            {"encode", "kodekan"},
+            {"decode", "uraikan"},
+            {"decode_safe", "uraikan_aman"},
+            {"null", "nihil"}
+        }},
+        {"https", {
+            {"get", "ambil"},
+            {"post", "kirim"},
+            {"put", "taruh"},
+            {"delete", "hapus"},
+            {"request", "permintaan"}
+        }},
+        {"http", {
+            {"get", "ambil"},
+            {"post", "kirim"},
+            {"put", "taruh"},
+            {"delete", "hapus"},
+            {"request", "permintaan"}
         }}
     };
     return map;

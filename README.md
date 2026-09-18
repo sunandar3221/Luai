@@ -571,6 +571,76 @@ Luai menyediakan seluruh fungsi inti bahasa secara global langsung tanpa awalan 
 - `korutin.status(ko)`: Memeriksa status: `"suspended"`, `"running"`, `"dead"` (`status`)
 - `korutin.bungkus(fungsi)`: Membuat fungsi wrapper korutin (`wrap`)
 
+### 7. Modul `json` (Dukungan JSON Bawaan Mandiri) [BARU v1.0.1]
+Luai menyediakan modul `json` bawaan berkecepatan tinggi untuk membaca dan menulis data JSON tanpa membutuhkan pustaka pihak ketiga:
+
+- **`json.kodekan(data, [rapi])` / `json.encode` / `json.tulis`**: Mengonversi tabel, teks, angka, boolean, atau nihil menjadi string JSON.
+  - Jika argumen ke-2 bernilai `benar` atau angka spasi (misal `2`), JSON diformat rapi (*pretty print*).
+- **`json.uraikan(str)` / `json.decode` / `json.baca`**: Menguraikan string JSON menjadi tabel Luai.
+- **`json.uraikan_aman(str)` / `json.decode_safe`**: Menguraikan string JSON secara aman (mengembalikan `hasil, nil` jika sukses, atau `nihil, error` jika gagal).
+- **`json.nihil` / `json.null`**: Penanda nilai `null` pada JSON.
+
+Contoh Penggunaan JSON:
+```lua
+-- Encode (Tabel ke JSON string)
+lokal biodata = {
+    nama = "Budi Santoso",
+    umur = 25,
+    lulus = benar,
+    keahlian = {"Luai", "C++", "JIT"}
+}
+lokal teks_json = json.kodekan(biodata, benar)
+cetak("Hasil JSON:")
+cetak(teks_json)
+
+-- Decode (JSON string ke Tabel)
+lokal data = json.uraikan(teks_json)
+cetak("Nama dari JSON:", data.nama)
+cetak("Keahlian ke-1  :", data.keahlian[1])
+```
+
+### 8. Modul `https` & `http` (Permintaan Web / API) [BARU v1.0.1]
+Luai menyertakan klien HTTP/HTTPS bawaan yang aman (*zero external dependency*), memanfaatkan WinHTTP native di Windows dan utilitas curl standar di Android Termux/Linux:
+
+- **`https.ambil(url, [opsi])` / `https.get`**: Melakukan HTTP GET request.
+- **`https.kirim(url, data_atau_opsi)` / `https.post`**: Melakukan HTTP POST request (otomatis mengirim JSON jika data berupa tabel).
+- **`https.taruh(url, data_atau_opsi)` / `https.put`**: Melakukan HTTP PUT request.
+- **`https.hapus(url, [opsi])` / `https.delete`**: Melakukan HTTP DELETE request.
+- **`https.permintaan(opsi)` / `https.request`**: Melakukan HTTP request serbaguna dengan opsi kustom.
+
+Struktur Tabel Respons:
+- `respons.status`: Kode status angka (misal `200`, `404`).
+- `respons.sukses` / `respons.success`: Boolean (`benar` jika 200 <= status < 400).
+- `respons.tubuh` / `respons.body`: String isi balasan server.
+- `respons.kepala` / `respons.headers`: Tabel respons headers.
+- `respons:json()`: Metode praktis untuk langsung menguraikan isi balasan sebagai JSON!
+
+Contoh Penggunaan HTTPS GET & Parsing JSON:
+```lua
+lokal resp = https.ambil("https://jsonplaceholder.typicode.com/todos/1")
+jika resp.sukses maka
+    cetak("Status:", resp.status)
+    lokal data = resp:json()
+    cetak("Judul Tugas:", data.title)
+    cetak("Selesai    :", data.completed)
+selain_itu
+    cetak("Gagal menghubungi server:", resp.kesalahan)
+selesai
+```
+
+Contoh Penggunaan HTTPS POST:
+```lua
+lokal payload = {
+    nama = "Pengguna Baru",
+    email = "pengguna@example.com"
+}
+lokal resp = https.kirim("https://httpbin.org/post", payload)
+jika resp.sukses maka
+    cetak("Respons Server:")
+    cetak(resp.tubuh)
+selesai
+```
+
 ---
 
 ## Ekstensi Editor & IDE
