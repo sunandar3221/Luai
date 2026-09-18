@@ -85,7 +85,7 @@ fi
 # Jika tidak ada berkas lokal (misal via curl | bash), unduh dari GitHub Releases
 if [ "$INSTALLED" -eq 0 ]; then
     echo "      Mengunduh binary '$BIN_NAME' dari rilis GitHub..."
-    URL_RELEASE="https://github.com/sunandar3221/Luai/releases/download/v1.0.0/$BIN_NAME"
+    URL_RELEASE="https://github.com/sunandar3221/Luai/releases/download/v1.0.1/$BIN_NAME"
     URL_RAW="https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/$BIN_NAME"
 
     if curl -sSL --fail "$URL_RELEASE" -o "$TARGET_BIN" 2>/dev/null; then
@@ -96,7 +96,7 @@ if [ "$INSTALLED" -eq 0 ]; then
         INSTALLED=1
     else
         echo "      [Peringatan] Gagal mengunduh $BIN_NAME. Mencoba unduh luai standar..."
-        curl -sSL "https://github.com/sunandar3221/Luai/releases/download/v1.0.0/luai" -o "$TARGET_BIN" 2>/dev/null || \
+        curl -sSL "https://github.com/sunandar3221/Luai/releases/download/v1.0.1/luai" -o "$TARGET_BIN" 2>/dev/null || \
         curl -sSL "https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/luai" -o "$TARGET_BIN"
         INSTALLED=1
     fi

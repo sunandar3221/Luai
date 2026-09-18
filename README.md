@@ -85,7 +85,7 @@ curl -sL https://raw.githubusercontent.com/sunandar3221/Luai/main/luai-termux/in
 #### Metode B: Mengunduh Arsip dari GitHub Release
 1. Unduh berkas `luai-termux.tar.gz` langsung dari halaman [GitHub Releases](https://github.com/sunandar3221/Luai/releases):
    ```bash
-   curl -LO https://github.com/sunandar3221/Luai/releases/download/v1.0.0/luai-termux.tar.gz
+   curl -LO https://github.com/sunandar3221/Luai/releases/download/v1.0.1/luai-termux.tar.gz
    tar -xzf luai-termux.tar.gz
    cd luai-termux
    chmod +x install.sh
@@ -115,7 +115,7 @@ Jalankan `luai` tanpa argumen untuk membuka shell interaktif:
 ```
 Tampilan REPL:
 ```text
-Luai 1.0.0 (Dialek Bahasa Indonesia) [LuaJIT JIT Aktif]
+Luai 1.0.1 (Dialek Bahasa Indonesia) [LuaJIT JIT Aktif]
 Ketik "keluar" atau "exit" untuk mengakhiri sesi interaktif.
 
 luai> 10 + 25
@@ -152,7 +152,34 @@ Jalankan skrip terlebih dahulu, lalu masuk ke REPL dengan status lingkungan skri
 .\luai.exe -i skrip.luai
 ```
 
-### 5. Memeriksa Versi & Bantuan
+### 5. Mode Konversi Kode (Luai <-> Lua Standar) [FITUR BARU v1.0.1]
+Luai menyediakan alat konverter dua arah bawaan untuk mentranslasikan kode antara dialek Luai dan Lua standar secara instan:
+
+- **Konversi Luai ke Lua Standar** (`--ke-lua` atau `--to-lua`):
+  ```powershell
+  # Konversi berkas dan tampilkan ke layar terminal:
+  luai --ke-lua program.luai
+
+  # Konversi berkas dan simpan ke file tujuan (.lua):
+  luai --ke-lua program.luai -o program.lua
+
+  # Konversi langsung dari satu baris kode (inline):
+  luai --ke-lua -e "fungsi sapa(nama) cetak('Halo ' .. nama) selesai"
+  ```
+
+- **Konversi Lua Standar ke Luai** (`--ke-luai` atau `--to-luai`):
+  ```powershell
+  # Konversi berkas Lua ke Luai dan tampilkan ke layar:
+  luai --ke-luai program.lua
+
+  # Konversi berkas dan simpan ke file tujuan (.luai):
+  luai --ke-luai program.lua -o program.luai
+
+  # Konversi langsung dari satu baris kode (inline):
+  luai --ke-luai -e "function sapa(nama) print('Halo ' .. nama) end"
+  ```
+
+### 6. Memeriksa Versi & Bantuan
 ```powershell
 .\luai.exe -v
 .\luai.exe -h

@@ -1,4 +1,4 @@
-name: Build Android Termux Binaries
+name: Build and Release Luai Binaries (Windows, VSCode, Termux)
 
 on:
   push:
@@ -8,7 +8,8 @@ on:
       - 'src/**'
       - 'luajit/**'
       - 'luai-termux/**'
-      - '.github/workflows/build-termux.yml'
+      - 'luai-vscode/**'
+      - '.github/workflows/**'
   release:
     types:
       - published
@@ -19,6 +20,64 @@ permissions:
   contents: write
 
 jobs:
+  build-windows:
+    name: Build Windows (luai.exe & VS Code extension)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Compiler Environment
+        shell: bash
+        run: |
+          if [ -d "/c/Strawberry/c/bin" ]; then
+            echo "/c/Strawberry/c/bin" >> $GITHUB_PATH
+          fi
+
+      - name: Build LuaJIT for Windows x64
+        shell: bash
+        run: |
+          cd luajit/src
+          MAKE_CMD="make"
+          if command -v mingw32-make &>/dev/null; then
+            MAKE_CMD="mingw32-make"
+          fi
+          $MAKE_CMD clean || true
+          $MAKE_CMD -j4 TARGET_SYS=Windows BUILDMODE=static XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT"
+          ls -lh libluajit.a
+
+      - name: Compile Luai Windows Binary
+        shell: bash
+        run: |
+          g++ -static -O2 -std=c++17 -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp luajit/src/libluajit.a -o luai.exe
+          ./luai.exe -v
+
+      - name: Package VS Code Extension
+        shell: bash
+        run: |
+          mkdir -p luai-vscode/bin
+          cp -f luai.exe luai-vscode/bin/luai.exe
+          cd luai-vscode
+          npx --yes @vscode/vsce package --no-git-tag-version
+          ls -lh *.vsix
+
+      - name: Upload Windows Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luai-windows
+          path: luai.exe
+
+      - name: Upload VS Code Extension Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luai-vscode-extension
+          path: luai-vscode/*.vsix
+
   build-arm64:
     name: Build ARM 64-bit (aarch64) with Android NDK
     runs-on: ubuntu-latest
@@ -161,7 +220,7 @@ jobs:
 
   package-and-release:
     name: Package Archives & Publish to GitHub Releases
-    needs: [build-arm64, build-arm32, build-x86_64]
+    needs: [build-windows, build-arm64, build-arm32, build-x86_64]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
@@ -171,6 +230,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y zip
+
+      - name: Download Windows Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: luai-windows
+          path: ./bin-windows
+
+      - name: Download VS Code Extension
+        uses: actions/download-artifact@v4
+        with:
+          name: luai-vscode-extension
+          path: ./bin-vscode
 
       - name: Download ARM64 Binary
         uses: actions/download-artifact@v4
@@ -190,7 +261,7 @@ jobs:
           name: luai-x86_64
           path: ./bin-x86_64
 
-      - name: Assemble Termux Package Directory
+      - name: Assemble Packages
         run: |
           cp -f bin-arm64/luai-arm64 luai-termux/luai-arm64
           cp -f bin-arm32/luai-arm32 luai-termux/luai-arm32
@@ -201,6 +272,8 @@ jobs:
           tar -czvf luai-termux.tar.gz luai-termux/
           zip -r luai-termux.zip luai-termux/
           ls -lh luai-termux/ luai-termux.tar.gz luai-termux.zip
+          ls -lh bin-windows/
+          ls -lh bin-vscode/
 
       - name: Upload Complete Termux Artifacts
         uses: actions/upload-artifact@v4
@@ -220,10 +293,13 @@ jobs:
         run: |
           TAG_NAME="${{ github.event.release.tag_name }}"
           if [ -z "$TAG_NAME" ]; then
-            TAG_NAME="v1.0.0"
+            TAG_NAME="v1.0.1"
           fi
 
-          FILES="luai-termux/luai-arm64 luai-termux/luai-arm32 luai-termux/luai-x86_64 luai-termux/luai luai-termux.tar.gz luai-termux.zip"
+          # Buat release jika belum ada
+          gh release view "$TAG_NAME" || gh release create "$TAG_NAME" --title "Luai $TAG_NAME" --notes "Rilis resmi Luai $TAG_NAME (Windows, VS Code Extension, Termux Android)" || true
+
+          FILES="bin-windows/luai.exe bin-vscode/*.vsix luai-termux/luai-arm64 luai-termux/luai-arm32 luai-termux/luai-x86_64 luai-termux/luai luai-termux.tar.gz luai-termux.zip"
 
           echo ">>> Upload ke release: $TAG_NAME"
           gh release upload "$TAG_NAME" $FILES --clobber || true

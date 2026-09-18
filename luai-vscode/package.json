@@ -2,7 +2,7 @@
   "name": "luai-vscode",
   "displayName": "Luai - Bahasa Pemrograman Dialek Bahasa Indonesia",
   "description": "Dukungan resmi sintaks, eksekusi berkas bawaan VS Code, REPL interaktif, dan snippets untuk bahasa pemrograman Luai.",
-  "version": "1.1.0",
+  "version": "1.0.1",
   "publisher": "luai-lang",
   "engines": {
     "vscode": "^1.74.0"

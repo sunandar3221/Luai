@@ -4,3 +4,6 @@
 /test.pdb
 /test_lua.pdb
 /test_luai.luai
+/build/
+*.png
+!assets/*.png
