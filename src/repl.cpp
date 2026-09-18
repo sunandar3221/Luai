@@ -67,7 +67,8 @@ bool Repl::isIncompleteChunk(const std::string& errorMsg) {
 }
 
 void Repl::run(LuaiRuntime& runtime) {
-    std::cout << "Luai 1.0.0 (Dialek Bahasa Indonesia) [LuaJIT JIT Aktif]\n";
+    std::cout << "Luai 1.0.0 (Dialek Bahasa Indonesia) - engine " << luaiEngineName()
+              << " [" << (luaiJitEnabled(runtime.getState()) ? "JIT aktif" : "tanpa JIT") << "]\n";
     std::cout << "Ketik \"keluar\" atau \"exit\" untuk mengakhiri sesi interaktif.\n\n";
 
     std::string buffer;

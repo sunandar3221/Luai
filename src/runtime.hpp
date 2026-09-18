@@ -6,6 +6,13 @@
 
 struct lua_State;
 
+// Informasi engine yang benar-benar dipakai (LuaJIT atau Lua 5.4).
+// Dipakai oleh main.cpp & repl.cpp supaya teks versi tidak menyesatkan.
+const char* luaiEngineName();
+const char* luaiEngineTagline();
+const char* luaiBuildPlatform();
+bool luaiJitEnabled(lua_State* L);
+
 class LuaiRuntime {
 public:
     LuaiRuntime();

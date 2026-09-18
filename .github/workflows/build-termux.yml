@@ -20,29 +20,43 @@ permissions:
 
 jobs:
   build-arm64:
-    name: Build ARM 64-bit (aarch64)
+    name: Build ARM 64-bit (aarch64) with Android NDK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Install ARM64 Cross-Compiler
+      - name: Setup Android NDK
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_ROOT}"
+          if [ -z "$NDK" ] || [ ! -d "$NDK" ]; then
+            NDK=$(ls -d /usr/local/lib/android/sdk/ndk/* 2>/dev/null | tail -n 1)
+          fi
+          echo "NDK_PATH=$NDK" >> $GITHUB_ENV
+          echo "TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
+          echo "Using Android NDK: $NDK"
 
-      - name: Build LuaJIT for ARM64
+      - name: Build LuaJIT for Android ARM64
         run: |
           make -C luajit/src clean
-          make -C luajit/src -j$(nproc) CROSS=aarch64-linux-gnu- TARGET_SYS=Linux BUILDMODE=static XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
+          make -C luajit/src -j$(nproc) \
+            STATIC_CC="$TOOLCHAIN/aarch64-linux-android24-clang" \
+            DYNAMIC_CC="$TOOLCHAIN/aarch64-linux-android24-clang -fPIC" \
+            TARGET_LD="$TOOLCHAIN/aarch64-linux-android24-clang" \
+            TARGET_AR="$TOOLCHAIN/llvm-ar rcus" \
+            TARGET_STRIP="$TOOLCHAIN/llvm-strip" \
+            TARGET_SYS=Linux \
+            BUILDMODE=static \
+            XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
 
       - name: Compile Luai ARM64 Binary
         run: |
-          aarch64-linux-gnu-g++ -static -O2 -std=c++17 -Iluajit/src \
-            src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+          $TOOLCHAIN/aarch64-linux-android24-clang++ -O2 -std=c++17 -static-libstdc++ \
+            -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
             luajit/src/libluajit.a -o luai-arm64
-          aarch64-linux-gnu-strip luai-arm64
+          $TOOLCHAIN/llvm-strip luai-arm64
           ls -lh luai-arm64
+          file luai-arm64
 
       - name: Upload ARM64 Artifact
         uses: actions/upload-artifact@v4
@@ -51,55 +65,46 @@ jobs:
           path: luai-arm64
 
   build-arm32:
-    name: Build ARM 32-bit (armv7l / armhf)
+    name: Build ARM 32-bit (armv7l / armhf) with Android NDK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Install Zig 0.13.0 (stable, dari ziglang.org)
+      - name: Setup Android NDK
         run: |
-          ZIG_VERSION="0.13.0"
-          ZIG_URL="https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
-          echo "Mengunduh Zig $ZIG_VERSION..."
-          curl -sSL "$ZIG_URL" -o /tmp/zig.tar.xz
-          tar -xf /tmp/zig.tar.xz -C /opt
-          sudo ln -sf "/opt/zig-linux-x86_64-${ZIG_VERSION}/zig" /usr/local/bin/zig
-          zig version
+          NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_ROOT}"
+          if [ -z "$NDK" ] || [ ! -d "$NDK" ]; then
+            NDK=$(ls -d /usr/local/lib/android/sdk/ndk/* 2>/dev/null | tail -n 1)
+          fi
+          echo "NDK_PATH=$NDK" >> $GITHUB_ENV
+          echo "TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
+          echo "Using Android NDK: $NDK"
 
       - name: Download Lua 5.4.7 source
         run: |
           curl -sSL https://www.lua.org/ftp/lua-5.4.7.tar.gz | tar -xz
-          echo "Lua 5.4.7 siap di $(pwd)/lua-5.4.7"
+          echo "Lua 5.4.7 siap"
 
-      - name: Compile Lua 5.4 objects untuk ARM32
+      - name: Compile Lua 5.4 objects with Android NDK
         run: |
           LUA_DIR="lua-5.4.7/src"
           for f in "$LUA_DIR"/*.c; do
             fname=$(basename "$f")
-            # Skip file main lua dan luac
             [ "$fname" = "lua.c" ] && continue
             [ "$fname" = "luac.c" ] && continue
-            echo "Compiling $fname..."
-            zig cc -target arm-linux-musleabihf -O2 -DLUA_USE_LINUX \
-              -I"$LUA_DIR" -c "$f" -o "${f%.c}.o"
+            $TOOLCHAIN/armv7a-linux-androideabi24-clang -O2 -DLUA_USE_LINUX -I"$LUA_DIR" -c "$f" -o "${f%.c}.o"
           done
-          echo "Lua objects selesai."
+          echo "Lua objects ARM32 selesai."
 
-      - name: Compile Luai ARM32 binary (Zig c++ + Lua 5.4)
+      - name: Compile Luai ARM32 Binary
         run: |
           LUA_DIR="lua-5.4.7/src"
           LUA_OBJS=$(ls "$LUA_DIR"/*.o)
-
-          zig c++ \
-            -target arm-linux-musleabihf \
-            -O2 -std=c++17 \
-            -DUSE_LUA54 \
-            -I"$LUA_DIR" \
-            src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
-            $LUA_OBJS \
-            -o luai-arm32
-
+          $TOOLCHAIN/armv7a-linux-androideabi24-clang++ -O2 -std=c++17 -DUSE_LUA54 -static-libstdc++ \
+            -I"$LUA_DIR" src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+            $LUA_OBJS -o luai-arm32
+          $TOOLCHAIN/llvm-strip luai-arm32
           ls -lh luai-arm32
           file luai-arm32
 
@@ -110,29 +115,43 @@ jobs:
           path: luai-arm32
 
   build-x86_64:
-    name: Build x86_64
+    name: Build x86_64 with Android NDK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Install Build Essentials
+      - name: Setup Android NDK
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential
+          NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_ROOT}"
+          if [ -z "$NDK" ] || [ ! -d "$NDK" ]; then
+            NDK=$(ls -d /usr/local/lib/android/sdk/ndk/* 2>/dev/null | tail -n 1)
+          fi
+          echo "NDK_PATH=$NDK" >> $GITHUB_ENV
+          echo "TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
+          echo "Using Android NDK: $NDK"
 
-      - name: Build LuaJIT for x86_64
+      - name: Build LuaJIT for Android x86_64
         run: |
           make -C luajit/src clean
-          make -C luajit/src -j$(nproc) TARGET_SYS=Linux BUILDMODE=static XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
+          make -C luajit/src -j$(nproc) \
+            STATIC_CC="$TOOLCHAIN/x86_64-linux-android24-clang" \
+            DYNAMIC_CC="$TOOLCHAIN/x86_64-linux-android24-clang -fPIC" \
+            TARGET_LD="$TOOLCHAIN/x86_64-linux-android24-clang" \
+            TARGET_AR="$TOOLCHAIN/llvm-ar rcus" \
+            TARGET_STRIP="$TOOLCHAIN/llvm-strip" \
+            TARGET_SYS=Linux \
+            BUILDMODE=static \
+            XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_UNWIND_EXTERNAL"
 
       - name: Compile Luai x86_64 Binary
         run: |
-          g++ -static -O2 -std=c++17 -Iluajit/src \
-            src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
+          $TOOLCHAIN/x86_64-linux-android24-clang++ -O2 -std=c++17 -static-libstdc++ \
+            -Iluajit/src src/lexer.cpp src/runtime.cpp src/repl.cpp src/main.cpp \
             luajit/src/libluajit.a -o luai-x86_64
-          strip luai-x86_64
+          $TOOLCHAIN/llvm-strip luai-x86_64
           ls -lh luai-x86_64
+          file luai-x86_64
 
       - name: Upload x86_64 Artifact
         uses: actions/upload-artifact@v4
@@ -176,7 +195,7 @@ jobs:
           cp -f bin-arm64/luai-arm64 luai-termux/luai-arm64
           cp -f bin-arm32/luai-arm32 luai-termux/luai-arm32
           cp -f bin-x86_64/luai-x86_64 luai-termux/luai-x86_64
-          cp -f luai-termux/luai-arm64 luai-termux/luai
+          cp -f bin-arm64/luai-arm64 luai-termux/luai
           chmod +x luai-termux/luai* luai-termux/install.sh
 
           tar -czvf luai-termux.tar.gz luai-termux/
@@ -204,16 +223,13 @@ jobs:
             TAG_NAME="v1.0.0"
           fi
 
-          # Upload semua sekaligus (1 panggilan = lebih cepat dari per-file)
           FILES="luai-termux/luai-arm64 luai-termux/luai-arm32 luai-termux/luai-x86_64 luai-termux/luai luai-termux.tar.gz luai-termux.zip"
 
           echo ">>> Upload ke release: $TAG_NAME"
           gh release upload "$TAG_NAME" $FILES --clobber || true
 
-          # Upload ke BINARY di background (paralel) agar tidak blocking
           echo ">>> Upload ke release: BINARY (background)"
           gh release upload "BINARY" $FILES --clobber 2>/dev/null &
 
-          # Tunggu background upload selesai
           wait
           echo ">>> Semua upload selesai!"

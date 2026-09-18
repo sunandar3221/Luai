@@ -4,14 +4,16 @@
 #include <string>
 #include <vector>
 
-static void printVersion() {
+static void printVersion(const LuaiRuntime& runtime) {
     std::cout << "Luai 1.0.0 (Bahasa Pemrograman Lua Dialek Bahasa Indonesia)\n";
     std::cout << "Hak Cipta (C) 2026 Engine Luai.\n";
-    std::cout << "Berbasis LuaJIT [JIT Compiler Aktif] (https://luajit.org)\n";
+    std::cout << "Engine   : " << luaiEngineName() << " - " << luaiEngineTagline() << "\n";
+    std::cout << "Platform : " << luaiBuildPlatform() << "\n";
+    std::cout << "JIT      : " << (luaiJitEnabled(runtime.getState()) ? "aktif" : "tidak aktif") << "\n";
 }
 
-static void printHelp() {
-    printVersion();
+static void printHelp(const LuaiRuntime& runtime) {
+    printVersion(runtime);
     std::cout << "\nPenggunaan: luai [pilihan] [skrip [argumen...]]\n\n";
     std::cout << "Pilihan:\n";
     std::cout << "  -e kode        Mengeksekusi satu baris kode Luai\n";
@@ -38,12 +40,12 @@ int main(int argc, char* argv[]) {
     std::string firstArg = argv[1];
 
     if (firstArg == "-v" || firstArg == "--versi" || firstArg == "--version") {
-        printVersion();
+        printVersion(runtime);
         return 0;
     }
 
     if (firstArg == "-h" || firstArg == "--bantuan" || firstArg == "--help") {
-        printHelp();
+        printHelp(runtime);
         return 0;
     }
 

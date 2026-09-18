@@ -255,6 +255,64 @@ static int luai_lepas(lua_State* L) {
     return lua_gettop(L);
 }
 
+// ---------------------------------------------------------------------------
+// Informasi engine (LuaJIT vs Lua 5.4) dan info platform hasil build.
+// Dipakai oleh main.cpp & repl.cpp supaya informasi versi selalu benar,
+// termasuk saat engine cadangan Lua 5.4 yang dipakai (tanpa JIT).
+// ---------------------------------------------------------------------------
+
+#ifndef LUAI_BUILD_PLATFORM
+#define LUAI_BUILD_PLATFORM "bawaan (build lokal tanpa info target)"
+#endif
+
+const char* luaiEngineName() {
+#if defined(LUAJIT_VERSION)
+    return LUAJIT_VERSION;
+#elif defined(LUA_RELEASE)
+    return LUA_RELEASE;
+#elif defined(LUA_VERSION)
+    return "Lua " LUA_VERSION;
+#else
+    return "Lua";
+#endif
+}
+
+const char* luaiEngineTagline() {
+#if defined(LUAJIT_VERSION) && !defined(LUAJIT_DISABLE_JIT)
+    return "JIT Compiler aktif (https://luajit.org)";
+#elif defined(LUAJIT_VERSION)
+    return "LuaJIT (JIT dimatikan saat kompilasi)";
+#else
+    return "interpreter murni (tanpa JIT Compiler)";
+#endif
+}
+
+const char* luaiBuildPlatform() {
+    return LUAI_BUILD_PLATFORM;
+}
+
+bool luaiJitEnabled(lua_State* L) {
+#if defined(LUAJIT_VERSION) && !defined(LUAJIT_DISABLE_JIT)
+    if (!L) {
+        return true;
+    }
+    int top = lua_gettop(L);
+    bool aktif = true;
+    lua_getglobal(L, "jit");
+    if (lua_istable(L, -1)) {
+        lua_getfield(L, -1, "status");
+        if (lua_isfunction(L, -1) && lua_pcall(L, 0, 2, 0) == LUA_OK) {
+            aktif = lua_toboolean(L, top + 1) != 0;
+        }
+    }
+    lua_settop(L, top);
+    return aktif;
+#else
+    (void)L;
+    return false;
+#endif
+}
+
 LuaiRuntime::LuaiRuntime() : L(nullptr) {}
 
 LuaiRuntime::~LuaiRuntime() {
