@@ -8,11 +8,11 @@ cetak("[1] Status JIT Aktif:", status_jit, "| Versi:", jit.version)
 lokal a, b, c = lepas({10, 20, 30})
 cetak("[2] Uji lepas():", a, b, c)
 
--- 3. Uji Library dasar & io
-cetak("[3] Tipe library 'dasar':", tipe(dasar))
-cetak("[4] Tipe library 'io':", tipe(io))
-cetak("[5] Fungsi dasar.cetak:", tipe(dasar.cetak))
-cetak("[6] Fungsi dasar.masukan:", tipe(dasar.masukan))
+-- 3. Uji Fungsi Bawaan Input & Modul io
+cetak("[3] Fungsi bawaan 'masukan':", tipe(masukan))
+cetak("[4] Fungsi bawaan 'minta':", tipe(minta))
+cetak("[5] Fungsi bawaan 'tanya':", tipe(tanya))
+cetak("[6] Fungsi bawaan 'baca':", tipe(baca))
 cetak("[7] Fungsi io.masukan:", tipe(io.masukan))
 cetak("[8] Fungsi io.minta:", tipe(io.minta))
 

@@ -332,7 +332,6 @@ bool LuaiRuntime::init() {
     luaL_openlibs(L);
     registerIndonesianBindings();
     registerModuleAliases();
-    registerDasarLibrary();
     registerSearcher();
 
     return true;
@@ -366,6 +365,9 @@ void LuaiRuntime::registerIndonesianBindings() {
     lua_pushcfunction(L, luai_masukan);
     lua_setglobal(L, "tanya");
 
+    lua_pushcfunction(L, luai_masukan);
+    lua_setglobal(L, "baca");
+
     lua_pushcfunction(L, luai_lepas);
     lua_setglobal(L, "lepas");
 
@@ -388,74 +390,6 @@ void LuaiRuntime::registerIndonesianBindings() {
     aliasGlobal("dofile", "eksekusi_file");
     aliasGlobal("require", "butuh");
     aliasGlobal("require", "perlu");
-}
-
-void LuaiRuntime::registerDasarLibrary() {
-    lua_newtable(L);
-
-    lua_pushcfunction(L, luai_masukan);
-    lua_setfield(L, -2, "masukan");
-
-    lua_pushcfunction(L, luai_masukan);
-    lua_setfield(L, -2, "minta");
-
-    lua_pushcfunction(L, luai_masukan);
-    lua_setfield(L, -2, "tanya");
-
-    lua_pushcfunction(L, luai_masukan);
-    lua_setfield(L, -2, "baca");
-
-    lua_pushcfunction(L, luai_cetak);
-    lua_setfield(L, -2, "cetak");
-
-    lua_pushcfunction(L, luai_tipe);
-    lua_setfield(L, -2, "tipe");
-
-    lua_pushcfunction(L, luai_ke_angka);
-    lua_setfield(L, -2, "ke_angka");
-
-    lua_pushcfunction(L, luai_ke_teks);
-    lua_setfield(L, -2, "ke_teks");
-
-    lua_pushcfunction(L, luai_pasangan);
-    lua_setfield(L, -2, "pasangan");
-
-    lua_pushcfunction(L, luai_i_pasangan);
-    lua_setfield(L, -2, "i_pasangan");
-
-    lua_pushcfunction(L, luai_lepas);
-    lua_setfield(L, -2, "lepas");
-
-    auto copyGlobalToTable = [this](const char* gName, const char* fieldName) {
-        lua_getglobal(L, gName);
-        if (!lua_isnil(L, -1)) {
-            lua_setfield(L, -2, fieldName);
-        } else {
-            lua_pop(L, 1);
-        }
-    };
-
-    copyGlobalToTable("assert", "tegaskan");
-    copyGlobalToTable("error", "kesalahan");
-    copyGlobalToTable("pcall", "panggil_aman");
-    copyGlobalToTable("pcall", "pcall_aman");
-    copyGlobalToTable("xpcall", "xpcall_aman");
-    copyGlobalToTable("setmetatable", "set_metatabel");
-    copyGlobalToTable("getmetatable", "ambil_metatabel");
-    copyGlobalToTable("collectgarbage", "koleksi_sampah");
-    copyGlobalToTable("select", "pilih");
-    copyGlobalToTable("load", "muat");
-    copyGlobalToTable("loadfile", "muat_file");
-    copyGlobalToTable("dofile", "eksekusi_file");
-    copyGlobalToTable("require", "butuh");
-    copyGlobalToTable("require", "perlu");
-
-    // Register global 'dasar'
-    lua_pushvalue(L, -1);
-    lua_setglobal(L, "dasar");
-
-    // Also register 'daar' for backward compatibility
-    lua_setglobal(L, "daar");
 }
 
 void LuaiRuntime::registerModuleAliases() {

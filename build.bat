@@ -9,9 +9,9 @@ if not exist luajit\src\libluajit.a (
     echo [1/2] Mengompilasi LuaJIT 2.1 static library...
     pushd luajit\src
     if exist "%LOCALAPPDATA%\Microsoft\WinGet\Packages\MartinStorsjo.LLVM-MinGW.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\llvm-mingw-20260616-ucrt-x86_64\bin\mingw32-make.exe" (
-        "%LOCALAPPDATA%\Microsoft\WinGet\Packages\MartinStorsjo.LLVM-MinGW.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\llvm-mingw-20260616-ucrt-x86_64\bin\mingw32-make.exe" XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT" BUILDMODE=static libluajit.a
+        "%LOCALAPPDATA%\Microsoft\WinGet\Packages\MartinStorsjo.LLVM-MinGW.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\llvm-mingw-20260616-ucrt-x86_64\bin\mingw32-make.exe" TARGET_SYS=Windows BUILDMODE=static XCFLAGS=-DLUAJIT_ENABLE_LUA52COMPAT libluajit.a
     ) else (
-        mingw32-make XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT" BUILDMODE=static libluajit.a 2>nul || make XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT" BUILDMODE=static libluajit.a 2>nul
+        mingw32-make TARGET_SYS=Windows BUILDMODE=static XCFLAGS=-DLUAJIT_ENABLE_LUA52COMPAT libluajit.a
     )
     popd
 ) else (

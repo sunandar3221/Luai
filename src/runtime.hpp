@@ -32,7 +32,6 @@ private:
 
     void registerIndonesianBindings();
     void registerModuleAliases();
-    void registerDasarLibrary();
     void registerSearcher();
     static int luaiSearcher(lua_State* L);
 };

@@ -118,7 +118,7 @@
           "name": "support.function.builtin.luai"
         },
         {
-          "match": "\\b(matematika|tabel|teks|sistem|io|korutin|dasar|daar)\\b",
+          "match": "\\b(matematika|tabel|teks|sistem|io|korutin)\\b",
           "name": "support.class.library.luai"
         },
         {

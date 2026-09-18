@@ -4,28 +4,38 @@
 #include <string>
 #include <vector>
 
-static void printVersion(const LuaiRuntime& runtime) {
+static void printVersion() {
     std::cout << "Luai 1.0.0 (Bahasa Pemrograman Lua Dialek Bahasa Indonesia)\n";
     std::cout << "Hak Cipta (C) 2026 Engine Luai.\n";
     std::cout << "Engine   : " << luaiEngineName() << " - " << luaiEngineTagline() << "\n";
     std::cout << "Platform : " << luaiBuildPlatform() << "\n";
-    std::cout << "JIT      : " << (luaiJitEnabled(runtime.getState()) ? "aktif" : "tidak aktif") << "\n";
 }
 
-static void printHelp(const LuaiRuntime& runtime) {
-    printVersion(runtime);
+static void printHelp() {
+    printVersion();
     std::cout << "\nPenggunaan: luai [pilihan] [skrip [argumen...]]\n\n";
     std::cout << "Pilihan:\n";
     std::cout << "  -e kode        Mengeksekusi satu baris kode Luai\n";
     std::cout << "  -i             Masuk ke mode interaktif (REPL) setelah menjalankan skrip\n";
     std::cout << "  -v, --versi    Menampilkan informasi versi Luai\n";
     std::cout << "  -h, --bantuan  Menampilkan bantuan penggunaan ini\n\n";
-    std::cout << "Mode Interaktif:\n";
-    std::cout << "  Jalankan 'luai' tanpa argumen untuk masuk ke interactive shell (REPL).\n";
+    std::cout << "Untuk memulai REPL interaktif, jalankan 'luai' tanpa argumen.\n";
     std::cout << "  Ketik 'keluar' atau 'exit' untuk mengakhiri shell.\n";
 }
 
 int main(int argc, char* argv[]) {
+    if (argc > 1) {
+        std::string firstArg = argv[1];
+        if (firstArg == "-v" || firstArg == "--versi" || firstArg == "--version") {
+            printVersion();
+            return 0;
+        }
+        if (firstArg == "-h" || firstArg == "--bantuan" || firstArg == "--help") {
+            printHelp();
+            return 0;
+        }
+    }
+
     LuaiRuntime runtime;
     if (!runtime.init()) {
         std::cerr << runtime.getLastError() << "\n";
@@ -38,16 +48,6 @@ int main(int argc, char* argv[]) {
     }
 
     std::string firstArg = argv[1];
-
-    if (firstArg == "-v" || firstArg == "--versi" || firstArg == "--version") {
-        printVersion(runtime);
-        return 0;
-    }
-
-    if (firstArg == "-h" || firstArg == "--bantuan" || firstArg == "--help") {
-        printHelp(runtime);
-        return 0;
-    }
 
     if (firstArg == "-e") {
         if (argc < 3) {

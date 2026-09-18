@@ -16,7 +16,7 @@ Dengan integrasi JIT Compiler, eksekusi kode Luai berjalan sangat cepat setara d
 3. [Panduan Penggunaan Interpreter (Cara Pakai)](#panduan-penggunaan-interpreter-cara-pakai)
 4. [Tutorial Kilat Luai (Crash Course 5 Menit)](#tutorial-kilat-luai-crash-course-5-menit)
 5. [Tabel Kamus Sintaks Resmi (22 Kata Kunci)](#tabel-kamus-sintaks-resmi-22-kata-kunci)
-6. [Library Standar & Input Pengguna (`dasar` & `io`)](#library-standar--input-pengguna-dasar--io)
+6. [Fungsi Bawaan Global & Input Pengguna (`io`)](#fungsi-bawaan-global--input-pengguna-io)
 7. [Modul Terjemahan Lainnya](#modul-terjemahan-lainnya)
 8. [Ekstensi Editor & IDE](#ekstensi-editor--ide)
 9. [Struktur Direktori Proyek](#struktur-direktori-proyek)
@@ -27,7 +27,7 @@ Dengan integrasi JIT Compiler, eksekusi kode Luai berjalan sangat cepat setara d
 
 - **Ditenagai LuaJIT Compiler (Sangat Cepat)**: Memanfaatkan mesin kompilasi *Trace-based JIT* dari LuaJIT 2.1 untuk performa eksekusi tingkat tinggi.
 - **Sintaks Bahasa Indonesia Baku**: 22 kata kunci Lua dipetakan ke Bahasa Indonesia yang konsisten dan ekspresif.
-- **Library `dasar` & `io` Interaktif**: Mendukung penuh fungsi interaktif untuk meminta masukan pengguna (`masukan`, `minta`, `tanya`, `baca`) dengan prompt teks langsung.
+- **Fungsi Bawaan Input & Modul `io` Interaktif**: Mendukung penuh fungsi interaktif untuk meminta masukan pengguna (`masukan`, `minta`, `tanya`, `baca`) dengan prompt teks langsung.
 - **Dukungan Multi-Modul**: Pengimporan berkas modul `.luai` otomatis melalui fungsi `butuh("nama_modul")` atau `perlu("nama_modul")`.
 - **REPL Interaktif Cerdas**: Interactive shell interaktif dengan prompt `luai> `, evaluasi ekspresi otomatis, blok multiline `>> `, dan penanganan keluar intuitif (`keluar` / `exit`).
 - **Binary Mandiri (*Zero Dependency*)**: Executable statis mandiri, tidak memerlukan instalasi runtime eksternal.
@@ -122,7 +122,7 @@ luai> 10 + 25
 35
 luai> matematika.akar(144)
 12
-luai> lokal nama = dasar.masukan("Nama Anda: ")
+luai> lokal nama = masukan("Nama Anda: ")
 Nama Anda: Budi
 luai> cetak("Halo, " .. nama)
 Halo, Budi
@@ -178,18 +178,18 @@ cetak("Usia :", usia)
 cetak("Aktif:", aktif)          -- otomatis dicetak sebagai 'benar'
 ```
 
-### 2. Meminta Input dari Pengguna (`dasar` & `io`)
+### 2. Meminta Input dari Pengguna (Fungsi Bawaan & Modul `io`)
 Luai menyediakan fungsi interaktif bawaan untuk meminta input pengguna dengan pesan teks (prompt):
 ```lua
--- Menggunakan library 'dasar'
-lokal nama = dasar.masukan("Masukkan nama Anda: ")
+-- Menggunakan fungsi bawaan langsung:
+lokal nama = masukan("Masukkan nama Anda: ")
 
--- Menggunakan library 'io'
+-- Menggunakan modul 'io':
 lokal umur = io.masukan("Masukkan umur Anda: ")
 
 -- Atau menggunakan alias fungsi:
-lokal hobi = io.minta("Hobi Anda: ")
-lokal kota = io.tanya("Kota domisili: ")
+lokal hobi = minta("Hobi Anda: ")
+lokal kota = tanya("Kota domisili: ")
 
 cetak("Halo " .. nama .. ", umur Anda " .. umur .. " tahun dari " .. kota .. "!")
 ```
@@ -359,30 +359,27 @@ cetak("Versi LuaJIT    :", jit.version) -- LuaJIT 2.1...
 
 ---
 
-## Library Standar & Input Pengguna (`dasar` & `io`)
+## Fungsi Bawaan Global & Input Pengguna (`io`)
 
 ### 1. Meminta Input dari Pengguna
-Luai menyediakan dukungan meminta masukan langsung dari pengguna:
+Luai menyediakan dukungan meminta masukan langsung dari pengguna, baik melalui fungsi bawaan global maupun melalui modul `io`:
 
 | Pemanggilan | Contoh | Penjelasan |
 |:---|:---|:---|
-| `dasar.masukan(pesan)` | `dasar.masukan("Nama: ")` | Menampilkan prompt dan membaca baris masukan teks pengguna |
-| `dasar.minta(pesan)` | `dasar.minta("Umur: ")` | Alias dari `dasar.masukan` |
-| `dasar.tanya(pesan)` | `dasar.tanya("Kota: ")` | Alias dari `dasar.masukan` |
-| `dasar.baca([format_atau_pesan])` | `dasar.baca("Alamat: ")` | Membaca masukan dengan pesan atau format tertentu |
+| `masukan(pesan)` | `masukan("Nama: ")` | Fungsi bawaan utama untuk menampilkan prompt dan membaca baris masukan teks pengguna |
+| `minta(pesan)` | `minta("Umur: ")` | Alias bawaan global dari `masukan` |
+| `tanya(pesan)` | `tanya("Kota: ")` | Alias bawaan global dari `masukan` |
+| `baca([format_atau_pesan])` | `baca("Alamat: ")` | Fungsi bawaan global untuk membaca masukan teks pengguna |
 | `io.masukan(pesan)` | `io.masukan("Email: ")` | Menampilkan prompt dan membaca masukan melalui modul `io` |
 | `io.minta(pesan)` | `io.minta("Password: ")` | Alias input pada modul `io` |
 | `io.tanya(pesan)` | `io.tanya("Y/N: ")` | Alias input pada modul `io` |
-| `io.baca([format_atau_pesan])` | `io.baca("Ketik: ")` | Membaca input (mendukung prompt atau format standar seperti `"*n"`) |
-| `masukan(pesan)` | `masukan("Nama: ")` | Fungsi global mandiri untuk meminta input pengguna |
-| `minta(pesan)` | `minta("Umur: ")` | Alias fungsi global |
-| `tanya(pesan)` | `tanya("Konfirmasi: ")` | Alias fungsi global |
+| `io.baca([format_atau_pesan])` | `io.baca("Ketik: ")` | Membaca input (mendukung prompt teks atau format standar seperti `"*n"`) |
 
 Contoh Penggunaan Input Lengkap:
 ```lua
-lokal nama = dasar.masukan("Nama Anda   : ")
+lokal nama = masukan("Nama Anda   : ")
 lokal umur = io.masukan("Umur Anda   : ")
-lokal hobi = io.minta("Hobi Anda   : ")
+lokal hobi = minta("Hobi Anda   : ")
 
 cetak("=========================")
 cetak("Data Pengguna:")
@@ -391,23 +388,28 @@ cetak("Umur:", umur)
 cetak("Hobi:", hobi)
 ```
 
-### 2. Isi Lengkap Library `dasar`
-Library `dasar` (dan alias kompatibilitas `daar`) menyediakan seluruh fungsi inti bahasa:
-- `dasar.masukan(prompt)` / `dasar.minta(prompt)` / `dasar.tanya(prompt)` / `dasar.baca(prompt)`
-- `dasar.cetak(...)`: Menampilkan nilai ke terminal (boolean & nihil otomatis diformat Bahasa Indonesia).
-- `dasar.tipe(nilai)`: Mengembalikan nama tipe (`"angka"`, `"teks"`, `"tabel"`, `"fungsi"`, `"boolean"`, `"nihil"`, `"korutin"`).
-- `dasar.ke_angka(nilai, [basis])`: Konversi teks ke angka.
-- `dasar.ke_teks(nilai)`: Konversi nilai ke teks.
-- `dasar.pasangan(tabel)`: Iterator pasangan kunci-nilai.
-- `dasar.i_pasangan(tabel)`: Iterator array indeks bernomor.
-- `dasar.lepas(tabel, [i], [j])`: Membongkar elemen tabel menjadi daftar nilai.
-- `dasar.tegaskan(kondisi, [pesan])`: Penegasan kebenaran logika (*assert*).
-- `dasar.kesalahan(pesan)`: Melempar pesan kesalahan (*error*).
-- `dasar.panggil_aman(fungsi, ...)`: Menjalankan fungsi dalam proteksi *pcall*.
-- `dasar.set_metatabel(tabel, meta)`: Menetapkan metatable.
-- `dasar.ambil_metatabel(tabel)`: Mengambil metatable.
-- `dasar.koleksi_sampah([opsi])`: Manajemen memori *garbage collector*.
-- `dasar.butuh(nama_modul)` / `dasar.perlu(nama_modul)`: Mengimpor modul berkas `.luai`.
+### 2. Daftar Lengkap Fungsi Bawaan Global
+Luai menyediakan seluruh fungsi inti bahasa secara global langsung tanpa awalan modul:
+- `masukan(prompt)` / `minta(prompt)` / `tanya(prompt)` / `baca(prompt)`: Membaca masukan terminal pengguna.
+- `cetak(...)`: Menampilkan nilai ke terminal (boolean & nihil otomatis diformat Bahasa Indonesia).
+- `tipe(nilai)`: Mengembalikan nama tipe (`"angka"`, `"teks"`, `"tabel"`, `"fungsi"`, `"boolean"`, `"nihil"`, `"korutin"`).
+- `ke_angka(nilai, [basis])`: Konversi teks ke angka (`tonumber`).
+- `ke_teks(nilai)`: Konversi nilai ke teks (`tostring`).
+- `pasangan(tabel)`: Iterator pasangan kunci-nilai (`pairs`).
+- `i_pasangan(tabel)`: Iterator array indeks bernomor (`ipairs`).
+- `lepas(tabel, [i], [j])`: Membongkar elemen tabel menjadi daftar nilai (`table.unpack`).
+- `tegaskan(kondisi, [pesan])`: Penegasan kebenaran logika (*assert*).
+- `kesalahan(pesan)`: Melempar pesan kesalahan (*error*).
+- `pcall_aman(fungsi, ...)` / `panggil_aman(fungsi, ...)`: Menjalankan fungsi dalam proteksi *pcall*.
+- `xpcall_aman(fungsi, penangan, ...)`: Proteksi *xpcall* dengan fungsi penangan kesalahan kustom.
+- `set_metatabel(tabel, meta)`: Menetapkan metatable (`setmetatable`).
+- `ambil_metatabel(tabel)`: Mengambil metatable (`getmetatable`).
+- `koleksi_sampah([opsi])`: Manajemen memori *garbage collector* (`collectgarbage`).
+- `pilih(indeks, ...)`: Memilih argumen berdasarkan indeks (`select`).
+- `muat(kode)`: Memuat kode Luai dari string (`load`).
+- `muat_file(nama_file)`: Memuat kode Luai dari berkas (`loadfile`).
+- `eksekusi_file(nama_file)`: Mengeksekusi berkas Luai secara langsung (`dofile`).
+- `butuh(nama_modul)` / `perlu(nama_modul)`: Mengimpor modul berkas `.luai` (`require`).
 
 ---
 
@@ -500,7 +502,7 @@ Luai/
 │   ├── lexer.hpp           # Header lexer / transpiler sintaks Bahasa Indonesia
 │   ├── lexer.cpp           # Tokenisasi, kata kunci, operator //, konkat angka, & member access
 │   ├── runtime.hpp         # Header runtime engine Luai & binding LuaJIT C API
-│   ├── runtime.cpp         # Implementasi library dasar, io, modul terjemahan, & JIT bridging
+│   ├── runtime.cpp         # Implementasi fungsi bawaan, modul io & terjemahan, & JIT bridging
 │   ├── repl.hpp            # Header interaktif REPL shell
 │   ├── repl.cpp            # Implementasi interaktif REPL & multi-line support
 │   └── main.cpp            # Titik masuk utama program CLI & versi
@@ -525,7 +527,7 @@ Luai/
 ├── luai-termux/            # Paket Binary Native Termux Android (ARM64 & x86_64)
 ├── test_luai.luai          # Skrip pengujian utama
 ├── test_fitur_baru.luai    # Skrip pengujian perbaikan bug & fitur baru
-├── test_input.luai         # Contoh skrip interaktif input pengguna (dasar & io)
+├── test_input.luai         # Contoh skrip interaktif input pengguna (modul io & global)
 ├── modul_kalkulator.luai   # Contoh modul terpisah untuk pengujian import
 ├── build.bat               # Skrip build otomatis menggunakan LuaJIT
 ├── luai.exe                # Executable binary interpreter Windows dengan JIT
