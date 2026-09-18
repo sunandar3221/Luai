@@ -552,60 +552,101 @@ Luai menyediakan seluruh fungsi inti bahasa secara global langsung tanpa awalan 
 - `sistem.hapus(nama_file)`: Menghapus file dari disk (`remove`)
 - `sistem.ganti_nama(lama, baru)`: Mengubah nama file (`rename`)
 
-### 5. Modul `berkas` & `io` (Operasi File & Input/Output)
-Luai menyediakan modul `berkas` (alias resmi Bahasa Indonesia untuk `io`) serta dukungan penuh metode objek berkas (`file handle`):
+### 5. Modul `berkas` (Operasi Berkas Bahasa Indonesia)
+Modul `berkas` adalah pustaka resmi Luai yang sepenuhnya dialihbahasakan ke Bahasa Indonesia untuk mengelola berkas dan *file handle*.
 
-#### A. Fungsi Modul `berkas` / `io`
-- `berkas.buka(nama_file, [mode])` / `io.buka`: Membuka file (`open`).
-- `berkas.masukan(pesan)` / `io.masukan`: Meminta dan membaca input baris dari pengguna.
-- `berkas.minta(pesan)` / `berkas.tanya(pesan)`: Alias meminta masukan pengguna.
-- `berkas.baca([format_atau_pesan])`: Membaca masukan pengguna atau stream file.
-- `berkas.tulis(...)`: Menulis ke terminal / stream keluaran standar (`write`).
-- `berkas.siram()` / `berkas.bilas()`: Membilas buffer keluaran (`flush`).
-- `berkas.tutup([file])`: Menutup handler berkas (`close`).
-- `berkas.baris([nama_file])`: Iterator membaca baris per baris (`lines`).
-- `berkas.berkas_masukan([file])`: Mengatur file masukan bawaan (`input`).
-- `berkas.berkas_keluaran([file])`: Mengatur file keluaran bawaan (`output`).
-- `berkas.file_sementara()`: Membuat file temporer (`tmpfile`).
+#### A. Fungsi Utama Modul `berkas`
+- `berkas.buka(nama_berkas, [mode])`: Membuka berkas dengan mode tertentu (misal `"r"` baca, `"w"` tulis, `"a"` tambah, `"b"` biner).
+- `berkas.masukan(pesan)` / `berkas.minta(pesan)` / `berkas.tanya(pesan)`: Menampilkan prompt dan meminta masukan teks dari pengguna.
+- `berkas.baca([format_atau_pesan])`: Membaca masukan dari pengguna atau stream masukan aktif.
+- `berkas.tulis(...)`: Menulis data langsung ke keluaran standar.
+- `berkas.siram()` / `berkas.bilas()`: Membilas buffer keluaran ke disk atau konsol.
+- `berkas.tutup([file])`: Menutup file handle yang diberikan (atau berkas keluaran default).
+- `berkas.baris([nama_berkas])`: Iterator untuk membaca berkas baris demi baris dalam perulangan `untuk`.
+- `berkas.berkas_masukan([file])`: Mengatur atau mengambil berkas masukan default (`input`).
+- `berkas.berkas_keluaran([file])`: Mengatur atau mengambil berkas keluaran default (`output`).
+- `berkas.file_sementara()`: Membuat berkas temporer yang otomatis terhapus saat ditutup (`tmpfile`).
 
-#### B. Metode Objek Berkas (`file:method` / `berkas:metode`)
-Setelah berkas dibuka dengan `lokal f = berkas.buka("nama.txt", "w")`, seluruh metode file handle dapat dipanggil dengan dialek Bahasa Indonesia:
+#### B. Metode Objek Berkas (`file:metode` / Handle Berkas)
+Ketika sebuah berkas dibuka dengan `lokal f = berkas.buka(...)` (atau `io.open`), objek berkas (*file handle*) tersebut menyediakan metode manipulasi data lengkap dalam Bahasa Indonesia:
 
-| Metode Luai | Metode Lua Asli | Keterangan & Penjelasan |
+| Metode Luai | Penjelasan Bahasa Indonesia | Ekivalen Lua Asli |
 |:---|:---|:---|
-| `f:tulis(...)` | `f:write(...)` | Menulis data teks atau angka ke dalam file |
-| `f:baca(...)` | `f:read(...)` | Membaca isi file (misal `"*semua"`, `"*a"`, `"*l"`, atau angka byte) |
-| `f:tutup()` | `f:close()` | Menutup berkas dan melepaskan resource |
-| `f:siram()` / `f:bilas()` | `f:flush()` | Membilas buffer data ke penyimpanan disk |
-| `f:baris()` | `f:lines()` | Iterator membaca file per baris dalam loop `untuk` |
-| `f:geser(...)` / `f:posisi(...)` | `f:seek(...)` | Memindahkan posisi kursor baca/tulis di file |
-| `f:atur_buffer(...)` | `f:setvbuf(...)` | Mengatur mode buffering (`"no"`, `"full"`, `"line"`) |
+| `f:tulis(...)` | Menulis data teks atau angka ke dalam berkas | `f:write(...)` |
+| `f:baca(...)` | Membaca isi berkas (misal `"*semua"` / `"*a"`, `"*l"`, atau angka byte) | `f:read(...)` |
+| `f:tutup()` | Menutup berkas dan melepaskan *handle* sistem operasi | `f:close()` |
+| `f:siram()` / `f:bilas()` | Membilas buffer data secara instan ke media penyimpanan disk | `f:flush()` |
+| `f:baris()` | Iterator untuk membaca isi berkas baris demi baris | `f:lines()` |
+| `f:geser(...)` / `f:posisi(...)` | Memindahkan posisi kursor baca/tulis di dalam berkas | `f:seek(...)` |
+| `f:atur_buffer(...)` | Mengatur mode penampungan buffer (`"no"`, `"full"`, `"line"`) | `f:setvbuf(...)` |
 
-**Contoh Menulis & Membaca Berkas:**
+**Contoh Menulis dan Membaca Berkas dengan Modul `berkas`:**
 ```lua
--- 1. Menulis ke berkas
+-- 1. Menulis ke berkas menggunakan dialek Indonesia
 lokal f = berkas.buka("pesan.txt", "w")
-f:tulis("Halo dari Luai!\n")
-f:tulis("Bahasa dialek Indonesia ditenagai LuaJIT.\n")
+f:tulis("Halo dari Luai v1.0.1!\n")
+f:tulis("Pemrograman dialek Indonesia ditenagai LuaJIT.\n")
 f:bilas()
 f:tutup()
 
--- 2. Membaca berkas per baris
+-- 2. Membaca berkas baris demi baris
 lokal baca_f = berkas.buka("pesan.txt", "r")
 untuk baris dalam baca_f:baris() lakukan
     cetak("Baris:", baris)
 selesai
 baca_f:tutup()
+
+-- 3. Membaca seluruh isi berkas sekaligus
+lokal file_semua = berkas.buka("pesan.txt", "r")
+lokal isi_lengkap = file_semua:baca("*semua")
+file_semua:tutup()
+cetak("Isi lengkap berkas:\n" .. isi_lengkap)
 ```
 
-### 6. Modul `korutin` (`coroutine`)
+---
+
+### 6. Modul `io` (Standar Input / Output Lua)
+Bagi pengguna yang terbiasa dengan sintaks standar Lua, modul `io` bawaan tetap tersedia secara penuh dan kompatibel 100%:
+
+- `io.open(nama_file, [mode])`: Membuka file dengan mode standar Lua (`"r"`, `"w"`, `"a"`, `"r+"`, dll.).
+- `io.read(...)`: Membaca masukan dari stdin sesuai format (`"*all"`, `"*line"`, dll.).
+- `io.write(...)`: Menulis langsung ke keluaran standar (`stdout`).
+- `io.input([file])`: Mengatur atau mengembalikan file masukan default.
+- `io.output([file])`: Mengatur atau mengembalikan file keluaran default.
+- `io.close([file])`: Menutup file handle yang sedang aktif.
+- `io.flush()`: Membilas buffer keluaran standar.
+- `io.lines([filename])`: Iterator membaca baris dari file atau stdin.
+- `io.tmpfile()`: Membuat file temporer sistem.
+- `io.type(obj)`: Memeriksa tipe objek file (`"file"`, `"closed file"`, atau `nil`).
+- `io.masukan(pesan)` / `io.buka(...)`: Alias bantuan Bahasa Indonesia juga dapat diakses lewat tabel `io`.
+
+Objek berkas yang dibuka melalui `io.open` juga mendukung metode standar (`f:write`, `f:read`, `f:close`, `f:flush`, `f:lines`, `f:seek`, `f:setvbuf`) maupun metode terjemahan Bahasa Indonesia (`f:tulis`, `f:baca`, `f:tutup`, `f:siram`/`f:bilas`, `f:baris`, `f:geser`, `f:atur_buffer`).
+
+**Contoh Penggunaan Modul `io`:**
+```lua
+lokal f = io.open("catatan_io.txt", "w")
+f:write("Ditulis menggunakan modul io standar.\n")
+f:flush()
+f:close()
+
+lokal baca_io = io.open("catatan_io.txt", "r")
+lokal teks = baca_io:read("*line")
+cetak("Output io: " .. teks)
+baca_io:close()
+```
+
+---
+
+### 7. Modul `korutin` (`coroutine`)
 - `korutin.buat(fungsi)`: Membuat instance korutin baru (`create`)
 - `korutin.lanjut(ko, ...)`: Menjalankan / melanjutkan korutin (`resume`)
 - `korutin.hasil(...)`: Menyerahkan eksekusi dari dalam korutin (`yield`)
 - `korutin.status(ko)`: Memeriksa status: `"suspended"`, `"running"`, `"dead"` (`status`)
 - `korutin.bungkus(fungsi)`: Membuat fungsi wrapper korutin (`wrap`)
 
-### 7. Modul `json` (Dukungan JSON Bawaan Mandiri) [BARU v1.0.1]
+---
+
+### 8. Modul `json` (Dukungan JSON Bawaan Mandiri) [BARU v1.0.1]
 Luai menyediakan modul `json` bawaan berkecepatan tinggi untuk membaca dan menulis data JSON tanpa membutuhkan pustaka pihak ketiga:
 
 - **`json.kodekan(data, [rapi])` / `json.encode` / `json.tulis`**: Mengonversi tabel, teks, angka, boolean, atau nihil menjadi string JSON.
@@ -633,7 +674,9 @@ cetak("Nama dari JSON:", data.nama)
 cetak("Keahlian ke-1  :", data.keahlian[1])
 ```
 
-### 8. Modul `https` & `http` (Permintaan Web / API) [BARU v1.0.1]
+---
+
+### 9. Modul `https` & `http` (Permintaan Web / API) [BARU v1.0.1]
 Luai menyertakan klien HTTP/HTTPS bawaan yang aman (*zero external dependency*), memanfaatkan WinHTTP native di Windows dan utilitas curl standar di Android Termux/Linux:
 
 - **`https.ambil(url, [opsi])` / `https.get`**: Melakukan HTTP GET request.
