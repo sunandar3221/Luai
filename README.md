@@ -552,44 +552,55 @@ Luai menyediakan seluruh fungsi inti bahasa secara global langsung tanpa awalan 
 - `sistem.hapus(nama_file)`: Menghapus file dari disk (`remove`)
 - `sistem.ganti_nama(lama, baru)`: Mengubah nama file (`rename`)
 
-### 5. Modul `berkas` (Operasi Berkas Bahasa Indonesia)
-Modul `berkas` adalah pustaka resmi Luai yang sepenuhnya dialihbahasakan ke Bahasa Indonesia untuk mengelola berkas dan *file handle*.
+### 5. Modul `io`
+- `io.masukan(pesan)`: Meminta dan membaca input baris dari pengguna.
+- `io.minta(pesan)` / `io.tanya(pesan)`: Alias untuk meminta masukan pengguna.
+- `io.baca([format_atau_pesan])`: Membaca masukan pengguna atau stream file (`read`).
+- `io.tulis(...)`: Menulis ke terminal / keluaran standar (`write`).
+- `io.buka(nama_file, [mode])`: Membuka file (`open`).
+- `io.tutup([file])`: Menutup file handler (`close`).
+- `io.siram()` / `io.bilas()`: Membilas buffer keluaran (`flush`).
+- `io.baris([nama_file])`: Iterator membaca baris per baris (`lines`).
+- `io.berkas_masukan([file])`: Mengatur file masukan *default* (`input`).
+- `io.berkas_keluaran([file])`: Mengatur file keluaran *default* (`output`).
 
-#### A. Fungsi Utama Modul `berkas`
-- `berkas.buka(nama_berkas, [mode])`: Membuka berkas dengan mode tertentu (misal `"r"` baca, `"w"` tulis, `"a"` tambah, `"b"` biner).
-- `berkas.masukan(pesan)` / `berkas.minta(pesan)` / `berkas.tanya(pesan)`: Menampilkan prompt dan meminta masukan teks dari pengguna.
-- `berkas.baca([format_atau_pesan])`: Membaca masukan dari pengguna atau stream masukan aktif.
-- `berkas.tulis(...)`: Menulis data langsung ke keluaran standar.
-- `berkas.siram()` / `berkas.bilas()`: Membilas buffer keluaran ke disk atau konsol.
-- `berkas.tutup([file])`: Menutup file handle yang diberikan (atau berkas keluaran default).
-- `berkas.baris([nama_berkas])`: Iterator untuk membaca berkas baris demi baris dalam perulangan `untuk`.
-- `berkas.berkas_masukan([file])`: Mengatur atau mengambil berkas masukan default (`input`).
-- `berkas.berkas_keluaran([file])`: Mengatur atau mengambil berkas keluaran default (`output`).
-- `berkas.file_sementara()`: Membuat berkas temporer yang otomatis terhapus saat ditutup (`tmpfile`).
+---
+
+### 6. Modul `berkas` (Operasi Berkas & File Handle)
+Modul `berkas` adalah modul khusus dalam Bahasa Indonesia untuk menangani operasi berkas dan manipulasi objek berkas (*file handle*):
+
+#### A. Fungsi Modul `berkas`
+- `berkas.buka(nama_berkas, [mode])`: Membuka berkas (`open`).
+- `berkas.baca([format_atau_pesan])`: Membaca isi berkas atau stream file (`read`).
+- `berkas.tulis(...)`: Menulis ke berkas atau keluaran standar (`write`).
+- `berkas.tutup([file])`: Menutup handler berkas (`close`).
+- `berkas.siram()` / `berkas.bilas()`: Membilas buffer berkas ke disk (`flush`).
+- `berkas.baris([nama_berkas])`: Iterator membaca baris per baris dari berkas (`lines`).
+- `berkas.file_sementara()`: Membuat berkas temporer (`tmpfile`).
 
 #### B. Metode Objek Berkas (`file:metode` / Handle Berkas)
-Ketika sebuah berkas dibuka dengan `lokal f = berkas.buka(...)` (atau `io.open`), objek berkas (*file handle*) tersebut menyediakan metode manipulasi data lengkap dalam Bahasa Indonesia:
+Ketika berkas dibuka dengan `lokal f = berkas.buka(...)` (atau `io.buka`), seluruh metode file handle dapat dipanggil dengan Bahasa Indonesia:
 
-| Metode Luai | Penjelasan Bahasa Indonesia | Ekivalen Lua Asli |
+| Metode Luai | Penjelasan / Fungsi | Ekivalen Lua Asli |
 |:---|:---|:---|
-| `f:tulis(...)` | Menulis data teks atau angka ke dalam berkas | `f:write(...)` |
-| `f:baca(...)` | Membaca isi berkas (misal `"*semua"` / `"*a"`, `"*l"`, atau angka byte) | `f:read(...)` |
-| `f:tutup()` | Menutup berkas dan melepaskan *handle* sistem operasi | `f:close()` |
-| `f:siram()` / `f:bilas()` | Membilas buffer data secara instan ke media penyimpanan disk | `f:flush()` |
-| `f:baris()` | Iterator untuk membaca isi berkas baris demi baris | `f:lines()` |
-| `f:geser(...)` / `f:posisi(...)` | Memindahkan posisi kursor baca/tulis di dalam berkas | `f:seek(...)` |
-| `f:atur_buffer(...)` | Mengatur mode penampungan buffer (`"no"`, `"full"`, `"line"`) | `f:setvbuf(...)` |
+| `file:tulis(...)` | Menulis ke file | `file:write(...)` |
+| `file:baca(...)` | Membaca dari file | `file:read(...)` |
+| `file:tutup()` | Menutup file | `file:close()` |
+| `file:siram()` / `file:bilas()` | Membilas buffer | `file:flush()` |
+| `file:baris()` | Iterator baris | `file:lines()` |
+| `file:geser(...)` / `file:posisi(...)` | Pindah posisi cursor di file | `file:seek(...)` |
+| `file:atur_buffer(...)` | Mengatur buffer file | `file:setvbuf(...)` |
 
-**Contoh Menulis dan Membaca Berkas dengan Modul `berkas`:**
+**Contoh Menulis & Membaca Berkas:**
 ```lua
--- 1. Menulis ke berkas menggunakan dialek Indonesia
+-- 1. Menulis ke berkas
 lokal f = berkas.buka("pesan.txt", "w")
-f:tulis("Halo dari Luai v1.0.1!\n")
-f:tulis("Pemrograman dialek Indonesia ditenagai LuaJIT.\n")
+f:tulis("Halo dari Luai!\n")
+f:tulis("Bahasa dialek Indonesia ditenagai LuaJIT.\n")
 f:bilas()
 f:tutup()
 
--- 2. Membaca berkas baris demi baris
+-- 2. Membaca berkas per baris
 lokal baca_f = berkas.buka("pesan.txt", "r")
 untuk baris dalam baca_f:baris() lakukan
     cetak("Baris:", baris)
@@ -598,41 +609,9 @@ baca_f:tutup()
 
 -- 3. Membaca seluruh isi berkas sekaligus
 lokal file_semua = berkas.buka("pesan.txt", "r")
-lokal isi_lengkap = file_semua:baca("*semua")
+lokal isi = file_semua:baca("*semua")
 file_semua:tutup()
-cetak("Isi lengkap berkas:\n" .. isi_lengkap)
-```
-
----
-
-### 6. Modul `io` (Standar Input / Output Lua)
-Bagi pengguna yang terbiasa dengan sintaks standar Lua, modul `io` bawaan tetap tersedia secara penuh dan kompatibel 100%:
-
-- `io.open(nama_file, [mode])`: Membuka file dengan mode standar Lua (`"r"`, `"w"`, `"a"`, `"r+"`, dll.).
-- `io.read(...)`: Membaca masukan dari stdin sesuai format (`"*all"`, `"*line"`, dll.).
-- `io.write(...)`: Menulis langsung ke keluaran standar (`stdout`).
-- `io.input([file])`: Mengatur atau mengembalikan file masukan default.
-- `io.output([file])`: Mengatur atau mengembalikan file keluaran default.
-- `io.close([file])`: Menutup file handle yang sedang aktif.
-- `io.flush()`: Membilas buffer keluaran standar.
-- `io.lines([filename])`: Iterator membaca baris dari file atau stdin.
-- `io.tmpfile()`: Membuat file temporer sistem.
-- `io.type(obj)`: Memeriksa tipe objek file (`"file"`, `"closed file"`, atau `nil`).
-- `io.masukan(pesan)` / `io.buka(...)`: Alias bantuan Bahasa Indonesia juga dapat diakses lewat tabel `io`.
-
-Objek berkas yang dibuka melalui `io.open` juga mendukung metode standar (`f:write`, `f:read`, `f:close`, `f:flush`, `f:lines`, `f:seek`, `f:setvbuf`) maupun metode terjemahan Bahasa Indonesia (`f:tulis`, `f:baca`, `f:tutup`, `f:siram`/`f:bilas`, `f:baris`, `f:geser`, `f:atur_buffer`).
-
-**Contoh Penggunaan Modul `io`:**
-```lua
-lokal f = io.open("catatan_io.txt", "w")
-f:write("Ditulis menggunakan modul io standar.\n")
-f:flush()
-f:close()
-
-lokal baca_io = io.open("catatan_io.txt", "r")
-lokal teks = baca_io:read("*line")
-cetak("Output io: " .. teks)
-baca_io:close()
+cetak("Isi lengkap:\n" .. isi)
 ```
 
 ---
