@@ -2,6 +2,7 @@
 #include "lexer.hpp"
 #include "json_module.hpp"
 #include "http_module.hpp"
+#include "error_handler.hpp"
 
 #if defined(USE_LUA54)
 #include "lua.hpp"
@@ -260,6 +261,38 @@ static int luai_lepas(lua_State* L) {
     return lua_gettop(L);
 }
 
+static int luai_pcall_aman(lua_State* L) {
+    int n = lua_gettop(L);
+    if (n < 1) {
+        return luaL_error(L, "pcall_aman membutuhkan setidaknya 1 argumen (fungsi)");
+    }
+    int status = lua_pcall(L, n - 1, LUA_MULTRET, 0);
+    if (status == LUA_OK) {
+        lua_pushboolean(L, 1);
+        lua_insert(L, 1);
+        return lua_gettop(L);
+    } else {
+        const char* err = lua_tostring(L, -1);
+        std::string formatted = LuaiRuntime::formatError(err ? err : "Galat tidak dikenal");
+        lua_pop(L, 1);
+        lua_pushboolean(L, 0);
+        lua_pushlstring(L, formatted.data(), formatted.size());
+        return 2;
+    }
+}
+
+static int luai_tegaskan(lua_State* L) {
+    if (lua_toboolean(L, 1)) {
+        return lua_gettop(L);
+    }
+    const char* msg = lua_tostring(L, 2);
+    if (msg) {
+        return luaL_error(L, "%s", msg);
+    } else {
+        return luaL_error(L, "Penegasan gagal (kondisi bernilai salah atau nihil)");
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Informasi engine (LuaJIT vs Lua 5.4) dan info platform hasil build.
 // Dipakai oleh main.cpp & repl.cpp supaya informasi versi selalu benar,
@@ -383,10 +416,23 @@ void LuaiRuntime::registerIndonesianBindings() {
         lua_setglobal(L, dst);
     };
 
-    aliasGlobal("assert", "tegaskan");
+    lua_pushcfunction(L, luai_tegaskan);
+    lua_setglobal(L, "tegaskan");
+
+    lua_pushcfunction(L, luai_tegaskan);
+    lua_setglobal(L, "assert");
+
     aliasGlobal("error", "kesalahan");
-    aliasGlobal("pcall", "pcall_aman");
-    aliasGlobal("pcall", "panggil_aman");
+
+    lua_pushcfunction(L, luai_pcall_aman);
+    lua_setglobal(L, "pcall_aman");
+
+    lua_pushcfunction(L, luai_pcall_aman);
+    lua_setglobal(L, "panggil_aman");
+
+    lua_pushcfunction(L, luai_pcall_aman);
+    lua_setglobal(L, "pcall");
+
     aliasGlobal("xpcall", "xpcall_aman");
     aliasGlobal("setmetatable", "set_metatabel");
     aliasGlobal("getmetatable", "ambil_metatabel");
@@ -736,13 +782,13 @@ bool LuaiRuntime::executeString(const std::string& code, const std::string& chun
     std::string chunk = "=" + chunkName;
 
     if (luaL_loadbuffer(L, transpiled.data(), transpiled.size(), chunk.c_str()) != LUA_OK) {
-        lastError = lua_tostring(L, -1);
+        lastError = formatError(lua_tostring(L, -1));
         lua_pop(L, 1);
         return false;
     }
 
     if (lua_pcall(L, 0, LUA_MULTRET, 0) != LUA_OK) {
-        lastError = lua_tostring(L, -1);
+        lastError = formatError(lua_tostring(L, -1));
         lua_pop(L, 1);
         return false;
     }
@@ -754,7 +800,7 @@ bool LuaiRuntime::executeFile(const std::string& filepath, const std::vector<std
     lastError.clear();
     std::ifstream file(filepath, std::ios::in | std::ios::binary);
     if (!file.is_open()) {
-        lastError = "Tidak dapat membuka file: " + filepath;
+        lastError = formatError("Tidak dapat membuka file: " + filepath);
         return false;
     }
 
@@ -772,7 +818,7 @@ bool LuaiRuntime::executeFile(const std::string& filepath, const std::vector<std
 
     std::string chunkName = "@" + filepath;
     if (luaL_loadbuffer(L, transpiled.data(), transpiled.size(), chunkName.c_str()) != LUA_OK) {
-        lastError = lua_tostring(L, -1);
+        lastError = formatError(lua_tostring(L, -1));
         lua_pop(L, 1);
         return false;
     }
@@ -782,7 +828,7 @@ bool LuaiRuntime::executeFile(const std::string& filepath, const std::vector<std
     }
 
     if (lua_pcall(L, static_cast<int>(args.size()), LUA_MULTRET, 0) != LUA_OK) {
-        lastError = lua_tostring(L, -1);
+        lastError = formatError(lua_tostring(L, -1));
         lua_pop(L, 1);
         return false;
     }
@@ -804,7 +850,7 @@ bool LuaiRuntime::evaluateExpression(const std::string& expr, std::string& outpu
     }
 
     if (loadStatus != LUA_OK) {
-        lastError = lua_tostring(L, -1);
+        lastError = formatError(lua_tostring(L, -1));
         lua_pop(L, 1);
         return false;
     }
@@ -812,7 +858,7 @@ bool LuaiRuntime::evaluateExpression(const std::string& expr, std::string& outpu
     int base = lua_gettop(L) - 1;
     int pcallStatus = lua_pcall(L, 0, LUA_MULTRET, 0);
     if (pcallStatus != LUA_OK) {
-        lastError = lua_tostring(L, -1);
+        lastError = formatError(lua_tostring(L, -1));
         lua_pop(L, 1);
         return false;
     }
@@ -842,4 +888,8 @@ lua_State* LuaiRuntime::getState() const {
 
 std::string LuaiRuntime::getLastError() const {
     return lastError;
+}
+
+std::string LuaiRuntime::formatError(const std::string& rawError) {
+    return Luai::ErrorHandler::format(rawError);
 }

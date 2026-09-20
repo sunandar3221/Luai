@@ -699,6 +699,23 @@ selesai
 
 ---
 
+## Sistem Pesan Kesalahan Ramah Pemula (*Beginner-Friendly Error System*)
+
+Luai dilengkapi dengan **Sistem Pelaporan Kesalahan Ramah Pemula**. Alih-alih menampilkan pesan galat mentah bahasa Inggris dari compiler yang membingungkan bagi pemula, Luai secara otomatis menganalisis akar masalah, menerjemahkan konteksnya ke Bahasa Indonesia yang jelas, serta menyertakan **tips perbaikan praktis**:
+
+### Contoh Perbandingan Pesan Galat:
+
+| Jenis Kesalahan | Pesan Standar Mesin (Lama) | Pesan Luai Ramah Pemula (Baru) |
+|---|---|---|
+| **Lupa kata kunci `maka`** | `'then' expected near 'cetak'` | `[Kesalahan Sintaks] Baris 1 di skrip.luai:`<br>`  -> Diharapkan kata kunci 'maka' setelah kondisi percabangan 'jika', namun ditemukan 'cetak'.`<br>`  Tips: Format percabangan di Luai adalah: jika <kondisi> maka ... selesai` |
+| **Mengakses variabel kosong (`nihil`)** | `attempt to index local 'a' (a nil value)` | `[Kesalahan Runtime] Baris 1 di skrip.luai:`<br>`  -> Mencoba mengakses properti/indeks dari variabel lokal 'a' yang bernilai 'nihil' (kosong).`<br>`  Tips: Variabel 'a' belum memiliki isi tabel. Berikan nilai tabel terlebih dahulu (contoh: lokal a = {}) sebelum mengakses isinya.` |
+| **Memanggil fungsi yang belum dibuat** | `attempt to call global 'hitung' (a nil value)` | `[Kesalahan Runtime] Baris 1 di skrip.luai:`<br>`  -> Mencoba memanggil fungsi global 'hitung', namun fungsi tersebut tidak ditemukan (bernilai 'nihil').`<br>`  Tips: Periksa penulisan nama fungsi 'hitung'. Pastikan ejaan huruf besar/kecil sesuai dan fungsi sudah dibuat sebelum dipanggil.` |
+| **Salah tipe argumen fungsi** | `bad argument #1 to 'akar' (number expected, got string)` | `[Kesalahan Argumen] Baris 1 di skrip.luai:`<br>`  -> Argumen ke-1 pada fungsi 'akar' tidak valid: Diharapkan bertipe angka, namun diberikan teks (string).`<br>`  Tips: Periksa nilai yang dikirimkan saat memanggil fungsi 'akar'. Pastikan tipenya sesuai dengan yang diminta.` |
+| **Lupa menutup blok dengan `selesai`** | `'end' expected near '<eof>'` | `[Kesalahan Sintaks] Baris 1 di skrip.luai:`<br>`  -> Blok kode belum ditutup. Diharapkan kata kunci penutup 'selesai' sebelum akhir berkas/kode.`<br>`  Tips: Pastikan semua blok percabangan ('jika'), perulangan ('untuk', 'selama'), dan 'fungsi' sudah ditutup dengan kata 'selesai'.` |
+| **Rekursi tanpa batas** | `stack overflow` | `[Kesalahan Memori/Rekursi] Baris 1 di skrip.luai:`<br>`  -> Batas kapasitas penumpukan fungsi terlampaui (Stack Overflow).`<br>`  Tips: Terjadi pemanggilan fungsi berulang-ulang tanpa henti (rekursi tak terbatas). Pastikan fungsi Anda memiliki kondisi henti (base case) yang valid.` |
+
+---
+
 ## Ekstensi Editor & IDE
 
 ### 1. Visual Studio Code ([`luai-vscode/`](luai-vscode/))

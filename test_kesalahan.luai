@@ -1,0 +1,41 @@
+-- Skrip Uji Coba Penanganan Kesalahan Ramah Pemula
+cetak("=== Uji Coba Penanganan Kesalahan Ramah Pemula ===")
+
+-- 1. Menguji pcall_aman dengan kesalahan pengindeksan nilai nihil
+lokal sukses1, pesan1 = pcall_aman(fungsi()
+    lokal a = nihil
+    cetak(a.properti)
+selesai)
+
+cetak("\n1. Hasil Uji Nil Index:")
+cetak("   Sukses:", sukses1)
+cetak("   Pesan Kesalahan:\n" .. pesan1)
+
+-- 2. Menguji pcall_aman dengan kesalahan pemanggilan fungsi nihil
+lokal sukses2, pesan2 = pcall_aman(fungsi()
+    fungsi_yang_tidak_ada()
+selesai)
+
+cetak("\n2. Hasil Uji Nil Call:")
+cetak("   Sukses:", sukses2)
+cetak("   Pesan Kesalahan:\n" .. pesan2)
+
+-- 3. Menguji pcall_aman dengan kesalahan operasi matematika
+lokal sukses3, pesan3 = pcall_aman(fungsi()
+    lokal x = 10 + nihil
+selesai)
+
+cetak("\n3. Hasil Uji Operasi Hitung Nil:")
+cetak("   Sukses:", sukses3)
+cetak("   Pesan Kesalahan:\n" .. pesan3)
+
+-- 4. Menguji pcall_aman dengan argumen fungsi bawaan yang salah tipe
+lokal sukses4, pesan4 = pcall_aman(fungsi()
+    matematika.akar("bukan_angka")
+selesai)
+
+cetak("\n4. Hasil Uji Tipe Argumen Salah:")
+cetak("   Sukses:", sukses4)
+cetak("   Pesan Kesalahan:\n" .. pesan4)
+
+cetak("\n=== Selesai Uji Coba ===")

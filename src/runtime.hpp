@@ -25,6 +25,7 @@ public:
 
     lua_State* getState() const;
     std::string getLastError() const;
+    static std::string formatError(const std::string& rawError);
 
 private:
     lua_State* L;
