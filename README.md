@@ -699,20 +699,56 @@ selesai
 
 ---
 
-## Sistem Pesan Kesalahan Ramah Pemula (*Beginner-Friendly Error System*)
+## Sistem Pesan Kesalahan Ramah Pemula & Rekomendasi Typo (*Context-Aware & Typo Suggestions*)
 
-Luai dilengkapi dengan **Sistem Pelaporan Kesalahan Ramah Pemula**. Alih-alih menampilkan pesan galat mentah bahasa Inggris dari compiler yang membingungkan bagi pemula, Luai secara otomatis menganalisis akar masalah, menerjemahkan konteksnya ke Bahasa Indonesia yang jelas, serta menyertakan **tips perbaikan praktis**:
+Luai dilengkapi dengan **Sistem Pelaporan Kesalahan Ramah Pemula** yang cerdas memahami konteks kode (mirip dengan Python/Rust). Alih-alih menampilkan pesan galat mentah bahasa Inggris dari compiler yang membingungkan bagi pemula, Luai:
+1. **Menampilkan Cuplikan Kode & Pointer Visual (`^`)**: Menyoroti lokasi persis kata atau simbol yang bermasalah.
+2. **Mendeteksi Salah Sebut / Typo (*Did You Mean?*)**: Jika Anda salah ketik (misal mengetik `cwtak` alih-alih `cetak`), Luai otomatis menyarankan sintaks atau nama fungsi terdekat.
+3. **Menerjemahkan Konteks ke Bahasa Indonesia**: Menggunakan istilah Luai yang ramah (seperti `maka`, `selesai`, `nihil`).
+4. **Memberikan Tips Praktis**: Solusi konkret untuk menyelesaikan masalah tersebut secara langsung.
 
-### Contoh Perbandingan Pesan Galat:
+### Contoh Tampilan Nyata di Terminal:
 
-| Jenis Kesalahan | Pesan Standar Mesin (Lama) | Pesan Luai Ramah Pemula (Baru) |
+#### 1. Salah Sebut / Typo Nama Fungsi (`cwtak` -> `cetak`):
+```text
+[Kesalahan Runtime] Baris 3 di program.luai:
+   3 | cwtak("Halo Dunia!")
+     | ^^^^^
+  -> Fungsi global 'cwtak' tidak ditemukan (bernilai 'nihil').
+  -> Apakah maksud Anda: 'cetak'?
+  Tips: Periksa penulisan nama fungsi 'cwtak'. Pastikan ejaan sesuai dengan fungsi yang sudah dibuat.
+```
+
+#### 2. Typo Kata Kunci Percabangan (`mka` -> `maka`):
+```text
+[Kesalahan Sintaks] Baris 5 di program.luai:
+   5 | jika nilai >= 80 mka
+     |                  ^^^
+  -> Diharapkan kata kunci 'maka' setelah kondisi percabangan 'jika', namun ditemukan 'mka'.
+  -> Apakah maksud Anda kata kunci 'maka' (bukan 'mka')?
+  Tips: Format percabangan di Luai adalah: jika <kondisi> maka ... selesai
+```
+
+#### 3. Typo Fungsi Modul Bawaan (`teks.panjng` -> `teks.panjang`):
+```text
+[Kesalahan Runtime] Baris 2 di program.luai:
+   2 | lokal p = teks.panjng("Selamat Datang")
+     |                ^^^^^^
+  -> Kolom atau fungsi 'panjng' tidak ditemukan pada modul/tabel (bernilai 'nihil').
+  -> Apakah maksud Anda: 'panjang'?
+  Tips: Modul atau tabel tidak memiliki fungsi bernama 'panjng'. Periksa kembali daftar fungsi pada modul tersebut.
+```
+
+### Tabel Perbandingan Pesan Galat:
+
+| Kasus Kesalahan | Pesan Standar Mesin (Lama) | Pesan Luai Ramah Pemula (Baru) |
 |---|---|---|
-| **Lupa kata kunci `maka`** | `'then' expected near 'cetak'` | `[Kesalahan Sintaks] Baris 1 di skrip.luai:`<br>`  -> Diharapkan kata kunci 'maka' setelah kondisi percabangan 'jika', namun ditemukan 'cetak'.`<br>`  Tips: Format percabangan di Luai adalah: jika <kondisi> maka ... selesai` |
-| **Mengakses variabel kosong (`nihil`)** | `attempt to index local 'a' (a nil value)` | `[Kesalahan Runtime] Baris 1 di skrip.luai:`<br>`  -> Mencoba mengakses properti/indeks dari variabel lokal 'a' yang bernilai 'nihil' (kosong).`<br>`  Tips: Variabel 'a' belum memiliki isi tabel. Berikan nilai tabel terlebih dahulu (contoh: lokal a = {}) sebelum mengakses isinya.` |
-| **Memanggil fungsi yang belum dibuat** | `attempt to call global 'hitung' (a nil value)` | `[Kesalahan Runtime] Baris 1 di skrip.luai:`<br>`  -> Mencoba memanggil fungsi global 'hitung', namun fungsi tersebut tidak ditemukan (bernilai 'nihil').`<br>`  Tips: Periksa penulisan nama fungsi 'hitung'. Pastikan ejaan huruf besar/kecil sesuai dan fungsi sudah dibuat sebelum dipanggil.` |
-| **Salah tipe argumen fungsi** | `bad argument #1 to 'akar' (number expected, got string)` | `[Kesalahan Argumen] Baris 1 di skrip.luai:`<br>`  -> Argumen ke-1 pada fungsi 'akar' tidak valid: Diharapkan bertipe angka, namun diberikan teks (string).`<br>`  Tips: Periksa nilai yang dikirimkan saat memanggil fungsi 'akar'. Pastikan tipenya sesuai dengan yang diminta.` |
-| **Lupa menutup blok dengan `selesai`** | `'end' expected near '<eof>'` | `[Kesalahan Sintaks] Baris 1 di skrip.luai:`<br>`  -> Blok kode belum ditutup. Diharapkan kata kunci penutup 'selesai' sebelum akhir berkas/kode.`<br>`  Tips: Pastikan semua blok percabangan ('jika'), perulangan ('untuk', 'selama'), dan 'fungsi' sudah ditutup dengan kata 'selesai'.` |
-| **Rekursi tanpa batas** | `stack overflow` | `[Kesalahan Memori/Rekursi] Baris 1 di skrip.luai:`<br>`  -> Batas kapasitas penumpukan fungsi terlampaui (Stack Overflow).`<br>`  Tips: Terjadi pemanggilan fungsi berulang-ulang tanpa henti (rekursi tak terbatas). Pastikan fungsi Anda memiliki kondisi henti (base case) yang valid.` |
+| **Salah ketik fungsi (`cwtak`)** | `attempt to call global 'cwtak'` | Menampilkan baris kode `cwtak(...)`, penunjuk `^^^^^`, dan rekomendasi: `Apakah maksud Anda: 'cetak'?` |
+| **Lupa kata kunci `maka`** | `'then' expected near 'cetak'` | Menampilkan baris `jika`, penunjuk posisi, dan saran: `Diharapkan kata kunci 'maka' setelah kondisi percabangan 'jika'.` |
+| **Mengakses variabel kosong (`nihil`)** | `attempt to index local 'a' (a nil value)` | Menyorot variabel `a`, menjelaskan nilainya masih kosong (`nihil`), dan memberi saran inisialisasi tabel `{}`. |
+| **Salah tipe argumen fungsi** | `bad argument #1 to 'akar' (number expected, got string)` | Menjelaskan bahwa argumen ke-1 fungsi `akar` membutuhkan `angka`, bukan `teks (string)`. |
+| **Lupa menutup blok dengan `selesai`** | `'end' expected near '<eof>'` | Mengidentifikasi blok yang belum ditutup (`fungsi`/`jika`/`untuk`) dan meminta penambahan `selesai`. |
+| **Rekursi tanpa batas** | `stack overflow` | Menjelaskan batas kapasitas penumpukan fungsi terlampaui dan menyarankan penambahan kondisi berhenti (*base case*). |
 
 ---
 

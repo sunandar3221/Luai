@@ -1,41 +1,40 @@
--- Skrip Uji Coba Penanganan Kesalahan Ramah Pemula
-cetak("=== Uji Coba Penanganan Kesalahan Ramah Pemula ===")
+-- Skrip Uji Coba Penanganan Kesalahan Ramah Pemula & Rekomendasi Typo
+cetak("=== Uji Coba Penanganan Kesalahan Ramah Pemula & Rekomendasi Typo ===")
 
--- 1. Menguji pcall_aman dengan kesalahan pengindeksan nilai nihil
-lokal sukses1, pesan1 = pcall_aman(fungsi()
-    lokal a = nihil
-    cetak(a.properti)
+-- 1. Menguji rekomendasi typo pemanggilan fungsi global (contoh: cwtak -> cetak)
+lokal s1, p1 = pcall_aman(fungsi()
+    cwtak("Halo Luai")
 selesai)
+cetak("\n[1] Uji Typo Fungsi 'cwtak':")
+cetak(p1)
 
-cetak("\n1. Hasil Uji Nil Index:")
-cetak("   Sukses:", sukses1)
-cetak("   Pesan Kesalahan:\n" .. pesan1)
-
--- 2. Menguji pcall_aman dengan kesalahan pemanggilan fungsi nihil
-lokal sukses2, pesan2 = pcall_aman(fungsi()
-    fungsi_yang_tidak_ada()
+-- 2. Menguji rekomendasi typo fungsi modul bawaan (contoh: panjng -> panjang)
+lokal s2, p2 = pcall_aman(fungsi()
+    lokal p = teks.panjng("Tes String")
 selesai)
+cetak("\n[2] Uji Typo Modul 'teks.panjng':")
+cetak(p2)
 
-cetak("\n2. Hasil Uji Nil Call:")
-cetak("   Sukses:", sukses2)
-cetak("   Pesan Kesalahan:\n" .. pesan2)
-
--- 3. Menguji pcall_aman dengan kesalahan operasi matematika
-lokal sukses3, pesan3 = pcall_aman(fungsi()
-    lokal x = 10 + nihil
+-- 3. Menguji pengindeksan nilai nihil
+lokal s3, p3 = pcall_aman(fungsi()
+    lokal akun = nihil
+    cetak(akun.saldo)
 selesai)
+cetak("\n[3] Uji Nil Indexing:")
+cetak(p3)
 
-cetak("\n3. Hasil Uji Operasi Hitung Nil:")
-cetak("   Sukses:", sukses3)
-cetak("   Pesan Kesalahan:\n" .. pesan3)
+-- 4. Menguji operasi matematika pada nilai nihil
+lokal s4, p4 = pcall_aman(fungsi()
+    lokal hitung = 50 + nihil
+selesai)
+cetak("\n[4] Uji Operasi Hitung Nil:")
+cetak(p4)
 
--- 4. Menguji pcall_aman dengan argumen fungsi bawaan yang salah tipe
-lokal sukses4, pesan4 = pcall_aman(fungsi()
+-- 5. Menguji tipe argumen yang tidak valid
+lokal s5, p5 = pcall_aman(fungsi()
     matematika.akar("bukan_angka")
 selesai)
+cetak("\n[5] Uji Tipe Argumen Salah:")
+cetak(p5)
 
-cetak("\n4. Hasil Uji Tipe Argumen Salah:")
-cetak("   Sukses:", sukses4)
-cetak("   Pesan Kesalahan:\n" .. pesan4)
-
-cetak("\n=== Selesai Uji Coba ===")
+cetak("\n=== Selesai Seluruh Uji Coba ===")

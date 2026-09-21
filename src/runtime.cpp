@@ -778,17 +778,19 @@ void LuaiRuntime::registerSearcher() {
 
 bool LuaiRuntime::executeString(const std::string& code, const std::string& chunkName) {
     lastError.clear();
+    currentSourceCode = code;
+    currentSourcePath = chunkName;
     std::string transpiled = Lexer::transpile(code);
     std::string chunk = "=" + chunkName;
 
     if (luaL_loadbuffer(L, transpiled.data(), transpiled.size(), chunk.c_str()) != LUA_OK) {
-        lastError = formatError(lua_tostring(L, -1));
+        lastError = formatError(lua_tostring(L, -1), code, chunkName);
         lua_pop(L, 1);
         return false;
     }
 
     if (lua_pcall(L, 0, LUA_MULTRET, 0) != LUA_OK) {
-        lastError = formatError(lua_tostring(L, -1));
+        lastError = formatError(lua_tostring(L, -1), code, chunkName);
         lua_pop(L, 1);
         return false;
     }
@@ -800,11 +802,13 @@ bool LuaiRuntime::executeFile(const std::string& filepath, const std::vector<std
     lastError.clear();
     std::ifstream file(filepath, std::ios::in | std::ios::binary);
     if (!file.is_open()) {
-        lastError = formatError("Tidak dapat membuka file: " + filepath);
+        lastError = formatError("Tidak dapat membuka file: " + filepath, "", filepath);
         return false;
     }
 
     std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    currentSourceCode = content;
+    currentSourcePath = filepath;
     std::string transpiled = Lexer::transpile(content);
 
     lua_newtable(L);
@@ -818,7 +822,7 @@ bool LuaiRuntime::executeFile(const std::string& filepath, const std::vector<std
 
     std::string chunkName = "@" + filepath;
     if (luaL_loadbuffer(L, transpiled.data(), transpiled.size(), chunkName.c_str()) != LUA_OK) {
-        lastError = formatError(lua_tostring(L, -1));
+        lastError = formatError(lua_tostring(L, -1), content, filepath);
         lua_pop(L, 1);
         return false;
     }
@@ -828,7 +832,7 @@ bool LuaiRuntime::executeFile(const std::string& filepath, const std::vector<std
     }
 
     if (lua_pcall(L, static_cast<int>(args.size()), LUA_MULTRET, 0) != LUA_OK) {
-        lastError = formatError(lua_tostring(L, -1));
+        lastError = formatError(lua_tostring(L, -1), content, filepath);
         lua_pop(L, 1);
         return false;
     }
@@ -839,6 +843,8 @@ bool LuaiRuntime::executeFile(const std::string& filepath, const std::vector<std
 bool LuaiRuntime::evaluateExpression(const std::string& expr, std::string& output) {
     lastError.clear();
     output.clear();
+    currentSourceCode = expr;
+    currentSourcePath = "=luai";
 
     std::string transpiled = Lexer::transpile(expr);
     std::string returnCode = "return " + transpiled;
@@ -850,7 +856,7 @@ bool LuaiRuntime::evaluateExpression(const std::string& expr, std::string& outpu
     }
 
     if (loadStatus != LUA_OK) {
-        lastError = formatError(lua_tostring(L, -1));
+        lastError = formatError(lua_tostring(L, -1), expr, "=luai");
         lua_pop(L, 1);
         return false;
     }
@@ -858,7 +864,7 @@ bool LuaiRuntime::evaluateExpression(const std::string& expr, std::string& outpu
     int base = lua_gettop(L) - 1;
     int pcallStatus = lua_pcall(L, 0, LUA_MULTRET, 0);
     if (pcallStatus != LUA_OK) {
-        lastError = formatError(lua_tostring(L, -1));
+        lastError = formatError(lua_tostring(L, -1), expr, "=luai");
         lua_pop(L, 1);
         return false;
     }
@@ -890,6 +896,6 @@ std::string LuaiRuntime::getLastError() const {
     return lastError;
 }
 
-std::string LuaiRuntime::formatError(const std::string& rawError) {
-    return Luai::ErrorHandler::format(rawError);
+std::string LuaiRuntime::formatError(const std::string& rawError, const std::string& sourceCode, const std::string& sourcePath) {
+    return Luai::ErrorHandler::format(rawError, sourceCode, sourcePath);
 }

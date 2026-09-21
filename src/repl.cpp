@@ -126,7 +126,7 @@ void Repl::run(LuaiRuntime& runtime) {
                 lua_settop(L, base);
             } else {
                 const char* err = lua_tostring(L, -1);
-                std::cerr << LuaiRuntime::formatError(err ? err : "Galat tidak dikenal") << "\n";
+                std::cerr << LuaiRuntime::formatError(err ? err : "Galat tidak dikenal", buffer, "=luai") << "\n";
                 lua_pop(L, 1);
             }
             buffer.clear();
@@ -139,7 +139,7 @@ void Repl::run(LuaiRuntime& runtime) {
         if (status == LUA_OK) {
             if (lua_pcall(L, 0, LUA_MULTRET, 0) != LUA_OK) {
                 const char* err = lua_tostring(L, -1);
-                std::cerr << LuaiRuntime::formatError(err ? err : "Galat tidak dikenal") << "\n";
+                std::cerr << LuaiRuntime::formatError(err ? err : "Galat tidak dikenal", buffer, "=luai") << "\n";
                 lua_pop(L, 1);
             }
             buffer.clear();
@@ -153,7 +153,7 @@ void Repl::run(LuaiRuntime& runtime) {
             continue;
         }
 
-        std::cerr << LuaiRuntime::formatError(err) << "\n";
+        std::cerr << LuaiRuntime::formatError(err, buffer, "=luai") << "\n";
         buffer.clear();
     }
 }

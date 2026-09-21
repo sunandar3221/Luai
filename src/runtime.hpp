@@ -25,11 +25,13 @@ public:
 
     lua_State* getState() const;
     std::string getLastError() const;
-    static std::string formatError(const std::string& rawError);
+    static std::string formatError(const std::string& rawError, const std::string& sourceCode = "", const std::string& sourcePath = "");
 
 private:
     lua_State* L;
     std::string lastError;
+    std::string currentSourceCode;
+    std::string currentSourcePath;
 
     void registerIndonesianBindings();
     void registerModuleAliases();
